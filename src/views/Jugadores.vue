@@ -1,8 +1,10 @@
 <script setup>
-import Base from "@/components/base/Base.vue";
 import axios from "axios";
 import Swal from "sweetalert2";
 import {onMounted, ref} from "vue";
+
+import Base from "@/components/base/Base.vue";
+import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 
 const token = localStorage.getItem('token')
 const indice = ref(-1)
@@ -193,7 +195,7 @@ const editarJugador = (item, index) => {
 <template>
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>BIENVENIDOS</h1>
+      <MensajeBienvenida/>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>

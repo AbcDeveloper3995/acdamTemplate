@@ -20,85 +20,85 @@ const router = createRouter({
     {
       path: '/nomencladores',
       name: 'nomencladores',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/NomencladorView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/licenciamiento',
       name: 'licenciamiento',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/LicenciamientoView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/contratoLicencia',
       name: 'contratoLicencia',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ContratoLicenciaView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/recaudacion',
       name: 'recaudacion',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/RecaudacionView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/reporteCobro',
       name: 'reporteCobro',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ReportesView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/reclamaciones',
       name: 'reclamaciones',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ReclamacionesView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/contratos',
       name: 'contratos',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ContratosView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/controlServiciosJuridicos',
       name: 'controlServiciosJuridicos',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ControlServiciosJuridicosView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/controlPagosServiciosJuridicos',
       name: 'controlPagosServiciosJuridicos',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ControlPagosServiciosJuridicosView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/reportes',
       name: 'reportes',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/ReportesView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/permisos',
       name: 'permisos',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/PermisosView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/grupos',
       name: 'grupos',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/GruposView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/usuarios',
       name: 'usuarios',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/UsuariosView.vue'),
       meta: {requiresAuth:true}
     },
     {
       path: '/trazas',
       name: 'trazas',
-      component: () => import('../views/Jugadores.vue'),
+      component: () => import('../views/TrazasView.vue'),
       meta: {requiresAuth:true}
     },
     {

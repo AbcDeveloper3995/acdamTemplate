@@ -1,9 +1,7 @@
 <script setup>
 import {computed, ref} from "vue";
+import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 
-console.log(5, localStorage.getItem('token'))
-const nombre = localStorage.getItem('nombre')
-const apellidos = localStorage.getItem('apellidos')
 const input = `<input type='text'>`
 const miLista = [{
   id:1,
@@ -65,7 +63,7 @@ const a = computed(()=>{
 <template>
   <main id="main" class="main">
     <div class="pagetitle">
-      <h1>Bienvenido {{nombre}} {{apellidos}}</h1>
+      <MensajeBienvenida/>
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item active"><span>Inicio /</span></li>
