@@ -18,9 +18,27 @@ const router = createRouter({
 
     },
     {
-      path: '/nomencladores',
-      name: 'nomencladores',
-      component: () => import('../views/NomencladorView.vue'),
+      path: '/cargo',
+      name: 'cargo',
+      component: () => import('../views/CargoView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/concepto',
+      name: 'concepto',
+      component: () => import('../views/ConceptoView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/modalidad',
+      name: 'modalidad',
+      component: () => import('../views/ModalidadView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/sector',
+      name: 'sector',
+      component: () => import('../views/SectorView.vue'),
       meta: {requiresAuth:true}
     },
     {
@@ -75,12 +93,6 @@ const router = createRouter({
       path: '/reportes',
       name: 'reportes',
       component: () => import('../views/ReportesView.vue'),
-      meta: {requiresAuth:true}
-    },
-    {
-      path: '/permisos',
-      name: 'permisos',
-      component: () => import('../views/PermisosView.vue'),
       meta: {requiresAuth:true}
     },
     {

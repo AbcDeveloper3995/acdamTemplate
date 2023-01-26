@@ -10,11 +10,12 @@ import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-          <li class="breadcrumb-item active">Nomencladores</li>
+          <li class="breadcrumb-item active">Sector</li>
         </ol>
       </nav>
     </div>
     <section class="section dashboard">
+
     </section>
   </main>
   <Base/>

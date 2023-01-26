@@ -77,7 +77,7 @@ const a = computed(()=>{
             <div class="col-xxl-4 col-md-6">
               <div class="card glassmorphism info-card sales-card">
                 <div class="card-body">
-                  <h5 class="card-title">GANACIAS <span>| MENSUAL</span></h5>
+                  <h5 class="card-title">GANACIAS <span style="color: black">| MENSUAL</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="icon bi bi-currency-euro"></i></div>
                     <div class="ps-3">
@@ -90,7 +90,7 @@ const a = computed(()=>{
             <div class="col-xxl-4 col-md-6">
               <div class="card glassmorphism info-card revenue-card">
                 <div class="card-body">
-                  <h5 class="card-title">GANACIAS <span>| ANUAL</span></h5>
+                  <h5 class="card-title">GANACIAS <span style="color: black">| ANUAL</span></h5>
                   <div class="d-flex align-items-center">
                     <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class=" icon bi bi-currency-dollar"></i></div>
                     <div class="ps-3">
@@ -220,9 +220,9 @@ const a = computed(()=>{
               <div class="card glassmorphism">
                 <div class="card-body">
                   <h5 class="card-title"></h5>
-                  <div class="alert alert-primary alert-dismissible fade show" role="alert"> <i class="bi bi-star me-1"></i> LICENCIAMIENTO</div>
-                  <div class="alert alert-secondary alert-dismissible fade show" role="alert"> <i class="bi bi-collection me-1"></i> CAPATAR ESTADO DE CUENTAS</div>
-                  <div class="alert alert-success alert-dismissible fade show" role="alert"> <i class="bi bi-check-circle me-1"></i> RECLAMACIONES</div>
+                  <div class="alert alert-primary alert-dismissible fade show" role="alert"> <i class="bi bi-star me-1"></i> <strong>LICENCIAMIENTO</strong></div>
+                  <div class="alert alert-secondary alert-dismissible fade show" role="alert"> <i class="bi bi-collection me-1"></i><strong> CAPTAR ESTADO DE CUENTAS</strong></div>
+                  <div class="alert alert-success alert-dismissible fade show" role="alert"> <i class="bi bi-check-circle me-1"></i><strong> RECLAMACIONES</strong></div>
                 </div>
               </div>
             </div>
@@ -230,9 +230,9 @@ const a = computed(()=>{
               <div class="card glassmorphism">
                 <div class="card-body">
                   <h5 class="card-title"></h5>
-                  <div class="alert alert-danger alert-dismissible fade show" role="alert"> <i class="bi bi-exclamation-octagon me-1"></i> CONTRATO LICENCIA</div>
-                  <div class="alert alert-warning alert-dismissible fade show" role="alert"> <i class="bi bi-exclamation-triangle me-1"></i> CAPTAR REPORTE DE COBRO</div>
-                  <div class="alert alert-info alert-dismissible fade show" role="alert"> <i class="bi bi-info-circle me-1"></i> CONTRATO SERVICIOS JURIDICOS</div>
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert"> <i class="bi bi-exclamation-octagon me-1"></i><strong> CONTRATO LICENCIA</strong></div>
+                  <div class="alert alert-warning alert-dismissible fade show" role="alert"> <i class="bi bi-exclamation-triangle me-1"></i><strong> CAPTAR REPORTE DE COBRO</strong></div>
+                  <div class="alert alert-info alert-dismissible fade show" role="alert"> <i class="bi bi-info-circle me-1"></i><strong> CONTRATO SERVICIOS JURIDICOS</strong></div>
 
                 </div>
               </div>

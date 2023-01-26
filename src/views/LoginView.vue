@@ -56,19 +56,19 @@ const submit = async (e) => {
               <div class="glassmorphism card mb-3">
                 <div class="card-body">
                   <div class="pt-4 pb-2">
-                    <h5 class="card-title text-center pb-0 fs-4">Inicio Sesion</h5>
+                    <h5 class="card-title text-center pb-0 fs-4">Inicio Sesión</h5>
                     <hr>
                   </div>
                   <form class="row g-3 needs-validation" novalidate="">
                     <div class="col-12">
                       <div class="form-floating"><input v-model="usuario" type="text"
-                                                        class="styleInputLogin form-control" id="floatingName"
+                                                        class="styleInput form-control" id="floatingName"
                                                         placeholder="Your Name"> <label for="floatingName">Ingrese
                         usuario</label></div>
                     </div>
                     <div class="col-12">
                       <div class="form-floating"><input v-model="password" type="password"
-                                                        class="styleInputLogin form-control" id="floatingName"
+                                                        class="styleInput form-control" id="floatingName"
                                                         placeholder="Your Name"> <label for="floatingName">Ingrese
                         contrasena</label></div>
                     </div>
@@ -140,7 +140,7 @@ const submit = async (e) => {
   }
 }
 
-.styleInputLogin {
+.styleInput {
   background: none;
   border-bottom-color: black;
   border-top: 0;

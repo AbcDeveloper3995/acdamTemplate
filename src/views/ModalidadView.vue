@@ -2,6 +2,7 @@
 import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 </script>
+
 <template>
   <main id="main" class="main">
     <div class="pagetitle">
@@ -9,7 +10,7 @@ import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
-          <li class="breadcrumb-item active">Permisos</li>
+          <li class="breadcrumb-item active">Modalidad</li>
         </ol>
       </nav>
     </div>

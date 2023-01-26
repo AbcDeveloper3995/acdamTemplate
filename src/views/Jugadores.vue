@@ -125,9 +125,8 @@ const submitAjax = async (e) => {
       console.log(1, response)
       if (response.status == 200) {
         Swal.fire(response.data.message)
+        indice.value = -1
         getJugadores()
-        let form = document.querySelector('#formPrueba')
-        form.reset()
       }
     }
 
@@ -139,6 +138,8 @@ const submitAjax = async (e) => {
       claves.forEach(item => {
         Swal.fire("Error en " + item, dataError[item][0])
       })
+    } else if (error.response.status == 500) {
+        Swal.fire("Error", "Ha ocurrido un error interno en el servidor.")
     }
   }
 
@@ -205,7 +206,86 @@ const editarJugador = (item, index) => {
     </div>
     <section class="section dashboard">
       <div class="row">
-        <div class="col-lg-8">
+        <div class="col-lg-12">
+          <div class="card glassmorphism">
+              <ul class="sidebar-nav p-2" id="cardFormulario">
+                  <a class="nav-link collapsed" style="background: None" data-bs-target="#formularioJugador" data-bs-toggle="collapse" href="#"
+                     aria-expanded="false"> <i class="bi-plus-circle"></i> <strong>{{indice==-1?'Nuevo jugador':'Actualizar jugador'}}</strong><i class="bi bi-chevron-down ms-auto"></i> </a>
+
+              </ul>
+            <div class="card-body nav-content collapse" id="formularioJugador"  data-bs-parent="#cardFormulario">
+              <form class="row g-3" id="formPrueba">
+                <div class="col-md-12">
+                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="nombre" id="floatingName"
+                                                    placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="apellidos"
+                                                    id="floatingEmail" placeholder="Apellidos"> <label
+                      for="floatingEmail">Apellidos</label></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Equipo" v-model="equipo">
+                      <option v-for="item in equiposAPI" :key="item.id" :value="item.id">{{ item.nombre}}
+                      </option>
+                    </select>
+                    <label for="floatingSelect">Equipo</label>
+                  </div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Posicion" v-model="posicion">
+                      <option v-for="(item, index) in listaPosiciones" :key="index" :value="item.clave">
+                        {{ item.valor }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect">Posicion</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="nivel"
+                                                    id="floatingEmail" placeholder="nivel"> <label for="floatingEmail">Nivel</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dorsal"
+                                                    id="floatingPassword" placeholder="Dorsal"> <label
+                      for="floatingPassword">Dorsal</label></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="goles"
+                                                    id="floatingPassword" placeholder="Goles"> <label
+                      for="floatingPassword">Goles</label></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="asistencias"
+                                                    id="floatingPassword" placeholder="Asistencias"> <label
+                      for="floatingPassword">Asistencias</label></div>
+                </div>
+                <div class="col-md-6">
+                  <div class="col-sm-10">
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox"
+                                                               v-model="tieneBalonDeOro" id="flexSwitchCheckDefault">
+                      <label class="form-check-label" for="flexSwitchCheckDefault">Tiene balon de oro</label></div>
+                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox"
+                                                               v-model="esTitular" id="flexSwitchCheckChecked"
+                                                               checked="">
+                      <label class="form-check-label" for="flexSwitchCheckChecked">Es titular</label></div>
+                  </div>
+                </div>
+                <div class="text-center">
+                  <button @click="submitAjax" class="miBtn btn btn-primary" type="submit">{{indice==-1?'Agregar':'Actualizar'}}
+                    <i class="bi bi-arrow-bar-right"></i></button>
+                  <button v-if="indice==-1" type="reset" class="btn btn-secondary m-lg-1">Resetear</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
           <div class="row">
             <div class="col-12">
               <div class="card glassmorphism">
@@ -255,80 +335,8 @@ const editarJugador = (item, index) => {
             </div>
           </div>
         </div>
-        <div class="col-lg-4">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">Nuevo Jugador</h5>
-              <form class="row g-3" id="formPrueba">
-                <div class="col-md-12">
-                  <div class="form-floating"><input type="text" class="form-control" v-model="nombre" id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating"><input type="text" class="form-control" v-model="apellidos"
-                                                    id="floatingEmail" placeholder="Apellidos"> <label
-                      for="floatingEmail">Apellidos</label></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                    <select class="form-select" id="floatingSelect" aria-label="Equipo" v-model="equipo">
-                      <option v-for="item in equiposAPI" :key="item.id" :value="item.id">{{ item.nombre}}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Equipo</label>
-                  </div>
-                </div>
-                <div class="col-md-12">
-                  <div class="form-floating mb-3">
-                    <select class="form-select" id="floatingSelect" aria-label="Posicion" v-model="posicion">
-                      <option v-for="(item, index) in listaPosiciones" :key="index" :value="item.clave">
-                        {{ item.valor }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Posicion</label>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating"><input type="number" class="form-control" v-model="nivel"
-                                                    id="floatingEmail" placeholder="nivel"> <label for="floatingEmail">Nivel</label>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating"><input type="number" class="form-control" v-model="dorsal"
-                                                    id="floatingPassword" placeholder="Dorsal"> <label
-                      for="floatingPassword">Dorsal</label></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating"><input type="number" class="form-control" v-model="goles"
-                                                    id="floatingPassword" placeholder="Goles"> <label
-                      for="floatingPassword">Goles</label></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="form-floating"><input type="number" class="form-control" v-model="asistencias"
-                                                    id="floatingPassword" placeholder="Asistencias"> <label
-                      for="floatingPassword">Asistencias</label></div>
-                </div>
-                <div class="col-md-6">
-                  <div class="col-sm-10">
-                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox"
-                                                               v-model="tieneBalonDeOro" id="flexSwitchCheckDefault">
-                      <label class="form-check-label" for="flexSwitchCheckDefault">Tiene balon de oro</label></div>
-                    <div class="form-check form-switch"><input class="form-check-input" type="checkbox"
-                                                               v-model="esTitular" id="flexSwitchCheckChecked"
-                                                               checked="">
-                      <label class="form-check-label" for="flexSwitchCheckChecked">Es titular</label></div>
-                  </div>
-                </div>
-                <div class="text-center">
-                  <button @click="submitAjax" class="miBtn btn btn-primary" type="submit">{{indice==-1?'Agregar':'Actualizar'}}
-                    <i class="bi bi-arrow-bar-right"></i></button>
-                  <button v-if="indice==-1" type="reset" class="btn btn-secondary m-lg-1">Resetear</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
       </div>
+
     </section>
   </main>
   <Base/>
@@ -340,6 +348,14 @@ const editarJugador = (item, index) => {
   background: linear-gradient(to top right, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.5));
   box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
   transition: linear 4s ease;
+}
+
+.styleInput {
+  background: none;
+  border-bottom-color: black;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
 }
 
 .sombra {
