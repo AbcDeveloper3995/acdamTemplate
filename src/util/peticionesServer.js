@@ -54,7 +54,7 @@ const GET = async (url, lista) => {
     }
 }
 const DELETE = (url) => {
-    notificacion('question','Atencion','Estas seguro de querer eliminar este jugador ?', 'Si, eliminar')
+    notificacion('question','Atencion','Estas seguro de querer eliminar este registro?', 'Si, eliminar')
     .then((result) => {
         if (result.isConfirmed) {
             axios.delete(url).then((response) => {
