@@ -1,19 +1,19 @@
 <script setup>
+import axios from "axios";
+
 import {inject, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 
-import Swal from "sweetalert2";
-import axios from "axios";
-
+import {notificaciones} from '@/util/notificacionesGlobal'
 
 const usuario = ref('')
 const password = ref('')
 const swal = inject('$swal')
 const router =useRouter()
-
+const {mensaje} = notificaciones()
 
 // Estrucutra base de peticion POST con axios y async await
-const submit = async (e) => {
+const logearse = async (e) => {
   e.preventDefault()
   try {
     let url = "login/"
@@ -22,23 +22,17 @@ const submit = async (e) => {
       password: password.value
     }
     let response = await axios.post(url, dataPost)
-    console.log(response.data)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
     localStorage.setItem('token', response.data.token)
     localStorage.setItem('username', response.data.usuario.username)
     localStorage.setItem('nombre', response.data.usuario.nombre)
     localStorage.setItem('apellidos', response.data.usuario.apellidos)
-    console.log(response)
     if (response.status == 200) {
-      Swal.fire(response.data.message)
+      mensaje('success','Exito', response.data.message)
       await router.push('/home')
-
     }
   } catch (error) {
-    console.log("error: ", error)
-    if (error.code=='ERR_NETWORK'){
-      Swal.fire("Error", "Ha ocurrido un error al intentar conectar con el servidor.")
-    }
+    error.code=='ERR_NETWORK' ? mensaje('error','Error', 'Ha ocurrido un error al intentar conectar con el servidor.'):mensaje('error','Error', error.response.data.error)
   }
 }
 </script>
@@ -73,7 +67,7 @@ const submit = async (e) => {
                         contrasena</label></div>
                     </div>
                     <div class="col-12">
-                      <button @click="submit" class="miBtn btn btn-primary w-100" type="submit">Aceptar <i
+                      <button @click="logearse" class="miBtn btn btn-outline-light w-100" type="submit">Aceptar <i
                           class="bi bi-arrow-bar-right"></i></button>
                     </div>
                   </form>
@@ -97,23 +91,26 @@ const submit = async (e) => {
   transition: linear 4s ease;
 }
 
-.miBtn {
+.miBtn{
+  border-radius: 10px;
   box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
 }
-
-.miBtn:hover {
+.miBtn:hover{
   box-shadow: none;
 }
 
 #logo {
   width: 200px;
   animation-name: giro;
-  animation-duration: 6s;
+  animation-duration: 8s;
   animation-direction: normal;
   animation-iteration-count: infinite;
   animation-timing-function: linear;
 }
 
+@keyframes giro {
+  0% {transform: rotateY(360deg)}
+}
 
 #translacion {
   width: 50px;

@@ -42,9 +42,21 @@ const router = createRouter({
       meta: {requiresAuth:true}
     },
     {
-      path: '/licenciamiento',
-      name: 'licenciamiento',
-      component: () => import('../views/LicenciamientoView.vue'),
+      path: '/utilizador',
+      name: 'utilizador',
+      component: () => import('../views/UtilizadorView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/representante',
+      name: 'representante',
+      component: () => import('../views/RepresentanteView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/contratoMandato',
+      name: 'contratoMandato',
+      component: () => import('../views/ContratoMandato.vue'),
       meta: {requiresAuth:true}
     },
     {

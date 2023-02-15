@@ -21,7 +21,7 @@ const {mensaje} = notificaciones()
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#" @click="router.push('/home')"><i class="bi bi-house-fill"></i></a></li>
-          <li class="breadcrumb-item active">Sector</li>
+          <li class="breadcrumb-item active">Utilizador</li>
         </ol>
       </nav>
     </div>

@@ -1,6 +1,17 @@
 <script setup>
+import axios from "axios";
+
 import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
+import {notificaciones} from '@/util/notificacionesGlobal'
+
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
+import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
+
+//DECLARACIONES
+const router =useRouter()
+const {mensaje} = notificaciones()
 </script>
 
 <template>
@@ -9,7 +20,7 @@ import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
       <MensajeBienvenida/>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="index.html">Inicio</a></li>
+          <li class="breadcrumb-item"><a href="#" @click="router.push('/home')"><i class="bi bi-house-fill"></i></a></li>
           <li class="breadcrumb-item active">Contrato Licencia</li>
         </ol>
       </nav>

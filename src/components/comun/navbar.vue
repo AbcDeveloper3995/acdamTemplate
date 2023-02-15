@@ -5,13 +5,11 @@ const router =useRouter()
 const username = localStorage.getItem('username')
 const nombre = localStorage.getItem('nombre')
 const apellidos = localStorage.getItem('apellidos')
-const home = () => {
-  router.push('/home')
-}
+
 </script>
 <template>
   <header id="header" class="header fixed-top d-flex align-items-center">
-    <div class="d-flex align-items-center justify-content-between"> <a class="logo d-flex align-items-center" @click="home"> <img id="logo" style="width: 150px; height: 650px" src="@/assets/img/acdam.jpg" alt=""> </a></div>
+    <div class="d-flex align-items-center justify-content-between"> <a class="logo d-flex align-items-center" @click="router.push('/home')"> <img id="logo" style="width: 150px; height: 650px" src="@/assets/img/acdam.jpg" alt=""> </a></div>
 
     <nav class="header-nav ms-auto">
       <ul class="d-flex align-items-center">

@@ -66,7 +66,7 @@ const a = computed(()=>{
       <MensajeBienvenida/>
       <nav>
         <ol class="breadcrumb">
-          <li class="breadcrumb-item active"><span>Inicio /</span></li>
+          <li class="breadcrumb-item active"><i class="bi bi-house-fill"> /</i></li>
         </ol>
       </nav>
     </div>
@@ -105,7 +105,7 @@ const a = computed(()=>{
                 <div class="card-body">
                   <h5 class="card-title">INGRESOS PENDIENTES</h5>
                   <div class="d-flex align-items-center">
-                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="icon bi bi-currency-exchange"></i></div>
+                    <div class="card-icon rounded-circle d-flex align-items-center justify-content-center"> <i class="icon bi bi-coin"></i></div>
                     <div class="ps-3">
                       <h6>1244</h6>
                     </div>

@@ -10,7 +10,9 @@ import {RouterLink} from 'vue-router'
       <li class="nav-item"><a class="nav-link "><i class="bi bi-device-ssd"></i><RouterLink to="/modalidad">Modalidad</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-grid"></i><RouterLink to="/sector">Sector</RouterLink></a></li>
       <span class="nav-heading text-black" style="font-size: 15px">Proceso Licenciamiento</span>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-window-x"></i><RouterLink to="/licenciamiento">Licenciamiento</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-alarm-fill"></i><RouterLink to="/utilizador">Utilizador</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-robot"></i><RouterLink to="/representante">Representante</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-window-x"></i><RouterLink to="/contratoMandato">Contrato Mandato</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-usb-symbol"></i><RouterLink to="/contratoLicencia">Contrato de licencia</RouterLink></a></li>
       <span class="nav-heading text-black" style="font-size: 15px">Proceso Recaudacion</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-thunderbolt-fill"></i><RouterLink to="/recaudacion">Recaudacion</RouterLink></a></li>

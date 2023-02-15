@@ -7,12 +7,9 @@ import 'sweetalert2/dist/sweetalert2.min.css'
 import './assets/main.css'
 import axios from "axios";
 
-
 const app = createApp(App)
-
 app.use(VueSweetalert2)
 app.use(router)
-
 app.mount('#app')
 
 axios.defaults.baseURL = "http://127.0.0.1:8000/"
