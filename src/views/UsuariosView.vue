@@ -98,7 +98,7 @@ const isActive = (pagina) => {
 
 onMounted(() => {
   getUsuariosPaginados()
-  GET("licenciamiento/cargo/", cargosAPI)
+  GET("usuario/cargo/", cargosAPI)
   GET("usuario/grupo/", gruposAPI)
 })
 </script>

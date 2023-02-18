@@ -29,7 +29,7 @@ let paginaActual = 0
 //PETICION GET PARA OBTENER LOS CARGOS YA PAGINADOS
 const getCargosPaginados = async (NoPagina = 1) => {
   try {
-    let url = `licenciamiento/cargo/${NoPagina}/paginado`
+    let url = `usuario/cargo/${NoPagina}/paginado`
     loading = true
     let response = await axios.get(url)
     loading = false
@@ -49,7 +49,7 @@ const getCargosPaginados = async (NoPagina = 1) => {
 const editarCargo = async (item, index) => {
   expandir.value = false
   indice.value = index
-  let url = `licenciamiento/cargo/${item.id}/`
+  let url = `usuario/cargo/${item.id}/`
   axios.get(url)
       .then((response) => {
         dataPost.value.pk = response.data.data.id
@@ -120,7 +120,7 @@ onMounted(() => {
                                                     placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
                 </div>
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/cargo/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('usuario/cargo/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> {{ indice == -1 ? 'Agregar' : 'Actualizar' }}</button>
                   <button v-if="indice==-1" type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                 </div>
@@ -169,7 +169,7 @@ onMounted(() => {
                     <td>
                         <span class="sombra badge bg-primary" @click="editarCargo(item, index)" title="Modificar"><i
                             class="bi bi-pencil"></i></span>
-                      <span class="sombra badge bg-danger m-lg-1" @click="DELETE('licenciamiento/cargo/'+item.id)"
+                      <span class="sombra badge bg-danger m-lg-1" @click="DELETE('usuario/cargo/'+item.id)"
                             title="Eliminar"><i class="bi bi-trash"></i></span>
                     </td>
                     <td>{{ item.nombre }}</td>

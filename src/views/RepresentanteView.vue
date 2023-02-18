@@ -19,6 +19,7 @@ const representanteAPI = ref([])
 const municipioAPI = ref([])
 const utilizadorAPI = ref([])
 const sectorAPI = ref([])
+const usuarioAPI = ref([])
 const dataPost = ref({
   pk: '',
   nombre: '',
@@ -28,6 +29,7 @@ const dataPost = ref({
   fk_municipio: '',
   fk_utilizador: '',
   fk_sector: '',
+  fk_usuario: '',
   direccion: '',
   nivelEscolaridad: '',
   codigo: '',
@@ -75,6 +77,7 @@ const editarRepresentante = async (item, index) => {
         dataPost.value.fk_municipio = response.data.data.fk_municipio
         dataPost.value.fk_utilizador = response.data.data.fk_utilizador
         dataPost.value.fk_sector = response.data.data.fk_sector
+        dataPost.value.fk_usuario = response.data.data.fk_usuario
         dataPost.value.direccion = response.data.data.direccion
         dataPost.value.nivelEscolaridad = response.data.data.nivelEscolaridad
         dataPost.value.codigo = response.data.data.codigo
@@ -112,6 +115,7 @@ onMounted(() => {
   GET("licenciamiento/municipio/", municipioAPI)
   GET("licenciamiento/utilizador/", utilizadorAPI)
   GET("licenciamiento/sector/", sectorAPI)
+  GET("usuario/", usuarioAPI)
 })
 </script>
 
@@ -193,7 +197,16 @@ onMounted(() => {
                     <label for="floatingSelect">Sector</label>
                   </div>
                 </div>
-                <div class="col-md-12">
+                <div class="col-md-6">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_usuario">
+                      <option v-for="item in usuarioAPI" :key="item.id" :value="item.id">{{ item.first_name }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect">Atendido por</label>
+                  </div>
+                </div>
+                <div class="col-md-6">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.direccion"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Direccion</label></div>
