@@ -25,6 +25,7 @@ import {RouterLink} from 'vue-router'
       <li class="nav-item"><a class="nav-link "><i class="bi bi-bag-x"></i><RouterLink to="/reportes">Reportes</RouterLink></a></li>
 
       <span class="nav-heading text-black" style="font-size: 15px">Administracion</span>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-bookmark"></i><RouterLink to="/proforma">Proformas</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-bookmark"></i><RouterLink to="/grupos">Grupos</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-people"></i><RouterLink to="/usuarios">Usuarios</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-device-ssd"></i><RouterLink to="/trazas">Trazas</RouterLink></a></li>

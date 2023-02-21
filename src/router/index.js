@@ -66,6 +66,12 @@ const router = createRouter({
       meta: {requiresAuth:true}
     },
     {
+      path: '/proforma',
+      name: 'proforma',
+      component: () => import('../views/ProformaView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
       path: '/recaudacion',
       name: 'recaudacion',
       component: () => import('../views/RecaudacionView.vue'),
