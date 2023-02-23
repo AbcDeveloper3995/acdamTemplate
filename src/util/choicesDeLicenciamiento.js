@@ -76,5 +76,17 @@ const CHOICES = [
             {value: 2, descripcion: 'Bianual musica grabada'},
         ]
     },
+    {
+        TIPO_JURIDICO: [
+            {value: 'MIPYME', descripcion: 'MIPYME'},
+            {value: 'CNA', descripcion: 'CNA'},
+        ]
+    },
+    {
+        TIPO_OBRA_COMERCIAL: [
+            {value: 'Vivo', descripcion: 'Vivo'},
+            {value: 'Grabada', descripcion: 'Grabada'},
+        ]
+    },
 ]
 export default CHOICES

@@ -110,19 +110,20 @@ onMounted(() => {
         <div class="col-lg-12">
           <div class="card glassmorphism">
             <ul class="sidebar-nav p-2" id="cardFormulario">
-              <a class="nav-link collapsed" style="background: None" data-bs-target="#formularioCargo"
+              <a class="nav-link collapsed" style="background: None" data-bs-target="#formularioProforma"
                  data-bs-toggle="collapse" href="#"
                  aria-expanded="false"> <i class="bi-plus-circle"></i>
-                <strong>{{ indice == -1 ? 'Nuevo cargo' : 'Actualizar cargo' }}</strong><i
+                <strong>{{ indice == -1 ? 'Nuevo proforma' : 'Actualizar proforma' }}</strong><i
                     class="bi bi-chevron-down ms-auto"></i>  </a>
 
             </ul>
-            <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioCargo"
+            <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioProforma"
                  data-bs-parent="#cardFormulario">
               <form class="row g-3">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.resolucion">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Proforma" v-model="dataPost.resolucion">
+                      <option value="">------------</option>
                       <option v-for="item in CHOICES[1].RESOLUCION" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
@@ -186,9 +187,9 @@ onMounted(() => {
                   <thead>
                   <tr>
                     <th scope="col">Acciones</th>
-                    <th scope="col">Resolucion</th>
                     <th scope="col">Nombre</th>
                     <th scope="col">Titulo</th>
+                    <th scope="col">Resolucion</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -200,9 +201,10 @@ onMounted(() => {
                       <span class="sombra badge bg-danger m-lg-1" @click="DELETE('licenciamiento/proforma/'+item.id)"
                             title="Eliminar"><i class="bi bi-trash"></i></span>
                     </td>
-                    <td>{{ item.resolucion }}</td>
                     <td>{{ item.nombre }}</td>
                     <td>{{ item.titulo }}</td>
+                    <td><i :class="item.resolucion === null?'bi bi-x-circle-fill':''"
+                           :style="item.resolucion === null?'color: red':''"></i>{{item.resolucion}}</td>
                   </tr>
                   </tbody>
                 </table>
