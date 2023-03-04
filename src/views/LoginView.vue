@@ -24,6 +24,7 @@ const logearse = async (e) => {
     let response = await axios.post(url, dataPost)
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + response.data.token
     localStorage.setItem('token', response.data.token)
+    localStorage.setItem('idUser', response.data.usuario.id)
     localStorage.setItem('username', response.data.usuario.username)
     localStorage.setItem('nombre', response.data.usuario.nombre)
     localStorage.setItem('apellidos', response.data.usuario.apellidos)
