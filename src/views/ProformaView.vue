@@ -20,7 +20,10 @@ const dataPost = ref({
   resolucion: '',
   titulo: '',
   nombre: '',
+  encabezado: '',
   descripcion: '',
+  descripcion2daParte: '',
+  descripcion3raParte: '',
 })
 
 let loading = ref(false)
@@ -55,11 +58,15 @@ const editarProforma = async (item, index) => {
   let url = `licenciamiento/proforma/${item.id}/`
   axios.get(url)
       .then((response) => {
+        console.log(response.data.data.descripcion3raParte)
         dataPost.value.pk = response.data.data.id
         dataPost.value.nombre = response.data.data.nombre
         dataPost.value.titulo = response.data.data.titulo
         dataPost.value.resolucion = response.data.data.resolucion
+        dataPost.value.encabezado = response.data.data.encabezado
         dataPost.value.descripcion = response.data.data.descripcion
+        dataPost.value.descripcion2daParte = response.data.data.descripcion2daParte
+        dataPost.value.descripcion3raParte = response.data.data.descripcion3raParte
       })
       .catch((error) => {
         mensaje('error','Error', error.response.data.error)
@@ -142,9 +149,27 @@ onMounted(() => {
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating">
+                    <textarea type="text" class="styleInput form-control" v-model="dataPost.encabezado"
+                              id="floatingName"
+                              placeholder="Nombre"></textarea> <label for="floatingName">Encabezado</label></div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating">
                     <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion"
                               id="floatingName"
                               placeholder="Nombre"></textarea> <label for="floatingName">Descripcion</label></div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion2daParte"
+                              id="floatingName"
+                              placeholder="Nombre"></textarea> <label for="floatingName">Descripcion Segunda Parte</label></div>
+                </div>
+                <div class="col-md-12">
+                  <div class="form-floating">
+                    <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion3raParte"
+                              id="floatingName"
+                              placeholder="Nombre"></textarea> <label for="floatingName">Descripcion Tercera Parte</label></div>
                 </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/proforma/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
