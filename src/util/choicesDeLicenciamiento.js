@@ -88,5 +88,25 @@ const CHOICES = [
             {value: 'Grabada', descripcion: 'Grabada'},
         ]
     },
+    {
+        ANEXOS_71: [
+            {value: 1, descripcion: 'Anexo Musica'},
+            {value: 2, descripcion: 'Anexo Audiovisual'},
+            {value: 3, descripcion: 'Anexo Cultura'},
+        ]
+    },
+    {
+        ANEXOS_72: [
+            {value: 4, descripcion: 'Anexo CIMEX'},
+            {value: 5, descripcion: 'Anexo Gaviota'},
+            {value: 6, descripcion: 'Anexo Tiendas Caribe'},
+        ]
+    },
+    {
+        TIPO_CATEGORIA_AUDIOVISUAL: [
+            {value: '1', descripcion: 'Sala de Cine'},
+            {value: '2', descripcion: 'Sala de Video'},
+        ]
+    },
 ]
 export default CHOICES

@@ -13,20 +13,23 @@ import {useRouter} from "vue-router";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import CHOICES from '../util/choicesDeLicenciamiento'
-import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
+import {GET, POST_PUT, DELETE, indiceActualizado} from '../util/peticionesServer'
 
 //DECLARACIONES
 const router =useRouter()
 const {mensaje} = notificaciones()
+const indice = indiceActualizado                //VARIABLE QUE CONTROLA EL COMPORTAMIENTO DEL FORMULARIO DEPENDIENDO SI SE CREAR O SE EDITA
 const utilizadorAPI = ref([])             //variable que almacenara un listado de utilizadores
 const representanteAPI = ref([])          //variable que almacenara un listado de representantes
 const proformaAPI = ref([])               //variable que almacenara un listado de proformas
 const contratoLicEstatalAPI = ref([])     //variable que almacenara un listado de contratos
 const municipioAPI = ref([])              //variable que almacenara un listado de municipios
+const modalidadAPI = ref([])              //variable que almacenara un listado de las modalidades
 const objProforma = ref({
   pk:'',
   nombre:'',
-  tipoProforma:''
+  tipoProforma:'',
+  resolucion:''
 })           //variable que almacenara un objeto proforma
 const objUtilizador = ref({
   pk:'',
@@ -38,6 +41,7 @@ const objUtilizador = ref({
 const dataPost = ref({
   pk: '',
   fk_proforma: '',
+  fk_usuario: localStorage.getItem('idUser'),
   fk_utilizador: '',
   fk_representantesAsociados: [],
   fk_municipio: '',
@@ -82,26 +86,54 @@ const dataPost = ref({
   telefono: '',
 })              //variable que almacenara la data del contrato(Paso 2) a enviar (para cuando es estatal)
 const lastContrato = ref({
+  pk:'',
   titulo:'',
   descripcion:'',
   numeroLicencia:'',
   codigo:'',
 })      //variable que almacenara el ultimo contrato creado
 const contratoFormato = ref('')
+const indicadorAnexo = ref(0)
+const dataAnexoPost = ref({
+  pk:'',
+  fk_contratoLicenciaEstatal:'',
+  fk_contratoLicenciaPersonaJ:'',
+  periocidadPago:'',
+  periocidadEntrega:'',
+  locacion:'',
+  tarifa:'',
+  categoria:'',
+  numeroHabitacion:'',
+  periodo:'',
+  tarifaTemporadaAlta:'',
+  tarifaTemporadaBaja:'',
+  tarifaOcupacionInferior:'',
+  importeTemporadaAlta:'',
+  importeTemporadaBaja:'',
+  importeTemporadaOcupacionInferior:'',
+  locacionModalidad:'',
+  cantidadPlazas:'',
+  importe:'',
+  modalidad:'',
+  tipoMusica :'',
+  categoriaAudiovisual:''
+})
+const anexo71MusicaAPI = ref([])
 let currentTabIndex = 0                        //variable que funciona como indice del wizard
 
 //PARA EL WIZARD
 const onChangeCurrentTab = (index, oldIndex) => {
   currentTabIndex = index;
   //OBTENCION DEL UTLTIMO CONTRATO CREADO PARA PODER RENDERIZARLO Y EXPORTARLO A PDF (PASO 3)
-  if (currentTabIndex === 2 && objUtilizador.value.tipo == 1){
-    let url = 'licenciamiento/contratoLicenciaEstatal/getlastContrato/'
+  if (currentTabIndex === 2 && objProforma.value.tipoProforma == 1){
+    let url = `licenciamiento/contratoLicenciaEstatal/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
                                    <h3><strong>DE OTRA PARTE:</strong> La ${response.data.utilizador} creada por la ${response.data.resolucionUtilizador}, de fecha ${response.data.fechaResolucionUtilizador}, por ${response.data.emisionResolucionUtilizador}, con domicilio legal en ${response.data.direccion} municipio ${response.data.municipio}, provincia ${response.data.provincia}, con Codigo REEUP ${response.data.codigoREEUP}, NIT ${response.data.nit} y Cuenta Bancaria en CUP No.${response.data.cuentaBancaria}, Titular: ${response.data.titular}, en el Banco de Credito y Comercio ${response.data.banco}, Sucursal ${response.data.sucursal}, sita en ${response.data.direccionBanco}, que en lo adelante se denominara a los efectos de este contrato, <strong>UTILIZADOR</strong>, representado en este cargo por ${response.data.nombreFirmanteContrato}, en su condicion de ${response.data.cargoFirmanteContrato} designado en este cargo por la Resolucion No. ${response.data.resolucionFirmante}, de fecha ${response.data.fechaResolucionFirmante}, emitido por el ${response.data.emitido}</h3>
                                    <h3>${response.data.descripcion}</h3>
                                    <h3>Y como muestra de conformidad y aceptación, las partes suscriben el presente contrato, en dos (2) ejemplares, a un mismo tenor y efectos legales, en La Habana, a los ${dia} días del mes de ${mes} de ${ano}.</h3>`
+          lastContrato.value.pk = response.data.id
           lastContrato.value.titulo = response.data.titulo
           lastContrato.value.numeroLicencia = response.data.numeroLicencia
           lastContrato.value.codigo = response.data.codigo
@@ -111,7 +143,7 @@ const onChangeCurrentTab = (index, oldIndex) => {
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 2) {
-    let url = 'licenciamiento/contratoLicenciaPersonaJuridica/getlastContrato/'
+    let url = `licenciamiento/contratoLicenciaPersonaJuridica/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
@@ -155,7 +187,7 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 3) {
-    let url = 'licenciamiento/contratoLicenciaPersonaNatural/getlastContrato/'
+    let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
@@ -199,7 +231,7 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 4) {
-    let url = 'licenciamiento/contratoLicenciaPersonaNatural/getlastContrato/'
+    let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
@@ -231,6 +263,12 @@ Telefono: _____________________ Email: ___________________</h3>
         .catch((error) => {
           mensaje('error','Error', error.response.data.error)
         })
+  }
+
+  // Asignar el id del ultimo contrato a su respectivo campo en el formulario del anexo, independientemente de
+  // cual anexo sea
+  if (currentTabIndex === 3 && objProforma.value.tipoProforma == 1){
+    dataAnexoPost.value.fk_contratoLicenciaEstatal = lastContrato.value.pk
   }
 }
 const onTabBeforeChange = () => {
@@ -269,6 +307,7 @@ const getProforma = (event) => {
       .then((response) => {
         objProforma.value.tipoProforma = response.data.data.tipo
         objProforma.value.nombre = response.data.data.nombre
+        objProforma.value.resolucion = response.data.data.resolucion
       })
       .catch((error) => {
         mensaje('error','Error', error.response.data.error)
@@ -309,11 +348,46 @@ const PDF = () => {
   html2pdf().from(content).set(options).save();
 }
 
+//FUNCION PARA RENDERIZAR EL FORMULARIO DE ANEXO SEGUN EL ANEXO SELECCIONADO
+const agingarValorIndicadorAnexo = (event) => {
+  indicadorAnexo.value = event.target.value
+}
+
+// FUNCION PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
+const actualizarAnexos71Musica = () => GET('licenciamiento/anexo71Musica/', anexo71MusicaAPI)
+
+// FUNCION PARA REASIGNAR EL ID AL CAMPO CONTRATO DEL ANEXO
+const asignarIdAlCampoContratoDelAnexo = () => {
+  let element = document.getElementById('contratoAnexo71Musica')
+  element.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
+}
+
+//FUNCION QUE BUSCA EL ANEXO A EDITAR Y PINTAR SUS DATOS EN EL FORMULARIO PARA SU POSTERIOR EDICION
+const editarAnexo = async (url, index) => {
+  indice.value = index
+  axios.get(url)
+      .then((response) => {
+        console.log(response.data)
+        dataAnexoPost.value.pk = response.data.data.id
+        dataAnexoPost.value.fk_contratoLicenciaEstatal = response.data.data.fk_contratoLicenciaEstatal
+        dataAnexoPost.value.fk_contratoLicenciaPersonaJ = response.data.data.fk_contratoLicenciaPersonaJ
+        dataAnexoPost.value.locacion = response.data.data.locacion
+        dataAnexoPost.value.tarifa = response.data.data.tarifa
+        dataAnexoPost.value.periocidadPago = response.data.data.periocidadPago
+        dataAnexoPost.value.tipoMusica = response.data.data.tipoMusica
+        dataAnexoPost.value.modalidad = response.data.data.modalidad
+        dataAnexoPost.value.periocidadEntrega = response.data.data.periocidadEntrega
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
+
 onMounted(() => {
   GET("licenciamiento/utilizador/", utilizadorAPI)
   GET("licenciamiento/representante/", representanteAPI)
   GET("licenciamiento/contratoLicenciaEstatal/", contratoLicEstatalAPI)
-
+  GET("licenciamiento/modalidad/", modalidadAPI)
 })
 </script>
 
@@ -393,14 +467,14 @@ onMounted(() => {
                   </select>
                   <label for="floatingSelect">Utilizadores</label>
                 </div>
-                <div v-if="objUtilizador.tipo=='1'" class="alert alert-secondary alert-dismissible fade show" role="alert">
+                <div v-if="objUtilizador.tipo=='Estatal'" class="alert alert-secondary alert-dismissible fade show" role="alert">
                   <h5><strong>Datos del utilizador:</strong></h5>
                   <p>Tipo: Estatal</p>
                   <p>Sector: {{ objUtilizador.sector }}</p>
                   <p>Derecho: {{ objUtilizador.derecho }}</p>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div v-if="objUtilizador.tipo=='2'" class="alert alert-secondary alert-dismissible fade show" role="alert">
+                <div v-if="objUtilizador.tipo=='No estatal'" class="alert alert-secondary alert-dismissible fade show" role="alert">
                   <h5><strong>Datos del utilizador:</strong></h5>
                   <p>Tipo: No estatal ({{ objUtilizador.tipoNoEstatal }}) </p>
                   <p>Sector: {{ objUtilizador.sector }}</p>
@@ -427,16 +501,6 @@ onMounted(() => {
               Ingrese la informacion solicitada para el modelo de contrato estatal</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 1">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_proforma"
-                                                    placeholder="Nombre"> <label for="floatingName">Profoma</label></div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_utilizador"
-                                                    placeholder="Nombre"> <label for="floatingName">Utilizador</label></div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.numeroLicencia"
                                                     id="floatingName"
@@ -509,7 +573,6 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">NIT</label></div>
                 </div>
-
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaBancaria"
                                                     id="floatingName"
@@ -579,6 +642,21 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Fecha Expiracion</label></div>
                 </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_proforma"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_utilizador"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" hidden class="styleInput form-control" v-model="dataPost.fk_usuario"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"></div>
+                </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaEstatal/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
@@ -591,16 +669,6 @@ onMounted(() => {
               Ingrese la informacion solicitada para el modelo de contrato no estatal juridico</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 2">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_proforma"
-                                                    placeholder="Nombre"> <label for="floatingName">Profoma</label></div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_utilizador"
-                                                    placeholder="Nombre"> <label for="floatingName">Utilizador</label></div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
@@ -774,7 +842,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.actividadComercial">
-                      <option v-for="item in CHOICES[6].ACTIVIDAD" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
                     <label for="floatingSelect">Actividad Comercial</label>
@@ -804,6 +872,21 @@ onMounted(() => {
                       <label class="form-check-label" for="flexSwitchCheckDefault">Comunicacion al publico de obras audiovisuales</label></div>
                   </div>
                 </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_proforma"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_utilizador"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" hidden class="styleInput form-control" v-model="dataPost.fk_usuario"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"></div>
+                </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaJuridica/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
@@ -816,16 +899,6 @@ onMounted(() => {
               Ingrese la informacion solicitada para el modelo de contrato no estatal natural (Contrato Ejecucion Publica)</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 3">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_proforma"
-                                                    placeholder="Nombre"> <label for="floatingName">Profoma</label></div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_utilizador"
-                                                    placeholder="Nombre"> <label for="floatingName">Utilizador</label></div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
@@ -876,7 +949,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.actividadComercial">
-                      <option v-for="item in CHOICES[6].ACTIVIDAD" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
                     <label for="floatingSelect">Actividad a ejercer</label>
@@ -999,6 +1072,21 @@ onMounted(() => {
                       <label class="form-check-label" for="flexSwitchCheckDefault">Comunicacion al publico de obras audiovisuales</label></div>
                   </div>
                 </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_proforma"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_utilizador"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" hidden class="styleInput form-control" v-model="dataPost.fk_usuario"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"></div>
+                </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
@@ -1011,16 +1099,6 @@ onMounted(() => {
               Ingrese la informacion solicitada para el modelo de contrato no estatal natural (Contrato Comprador-Vendedor)</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 4">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_proforma"
-                                                    placeholder="Nombre"> <label for="floatingName">Profoma</label></div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                    id="floatingName" v-model="dataPost.fk_utilizador"
-                                                    placeholder="Nombre"> <label for="floatingName">Utilizador</label></div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
@@ -1071,7 +1149,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.actividadComercial">
-                      <option v-for="item in CHOICES[6].ACTIVIDAD" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
                     <label for="floatingSelect">Actividad a ejercer</label>
@@ -1164,6 +1242,21 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Correo</label></div>
                 </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_proforma"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
+                                                    id="floatingName" v-model="dataPost.fk_utilizador"
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" hidden class="styleInput form-control" v-model="dataPost.fk_usuario"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"></div>
+                </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
@@ -1175,7 +1268,7 @@ onMounted(() => {
             <div v-if="currentTabIndex === 2" >
               <section id="pdf">
 <!--                PDF A GENRAR SI ES ESTATAL-->
-                <div v-if="objUtilizador.tipo == 1">
+                <div v-if="objProforma.tipoProforma == 1">
                   <div class="d-flex align-items-center justify-content-between">
                     <h5 class="text-center" ><strong>{{lastContrato.titulo}}</strong></h5>
                     <img src="../assets/img/acdamlogo.jpg">
@@ -1190,7 +1283,7 @@ onMounted(() => {
                     <p>Código de Utilizador No. {{lastContrato.codigo}}</p>
                   </div>
                   <br>
-                  <p v-if="objUtilizador.tipo == 1">
+                  <p>
                     <QuillEditor theme="bubble" toolbar="essential" v-model:content="contratoFormato" content-type="html" >
                     </QuillEditor>
                   </p>
@@ -1320,7 +1413,383 @@ onMounted(() => {
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
-            <h5 v-if="currentTabIndex === 3">Tab 3</h5>
+
+<!--            PROCESO PARA EL PASO 4-->
+            <div v-if="currentTabIndex === 3">
+              <h3>Proforma seleccionada: {{objProforma.nombre}}</h3>
+              <div class="col-md-6" v-if="objProforma.tipoProforma==1 && objProforma.resolucion==71">
+                <div class="form-floating mb-3">
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="agingarValorIndicadorAnexo">
+                    <option value="">-----------</option>
+                    <option v-for="item in CHOICES[12].ANEXOS_71" :key="item.value" :value="item.value">{{ item.descripcion }}
+                    </option>
+                  </select>
+                  <label for="floatingSelect">Anexos disponibles para la Resolucion 71</label>
+                </div>
+              </div>
+              <div class="col-md-6" v-else-if="objProforma.tipoProforma==1 && objProforma.resolucion==72" @change="agingarValorIndicadorAnexo">
+                <div class="form-floating mb-3">
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo">
+                    <option value="">-----------</option>
+                    <option v-for="item in CHOICES[13].ANEXOS_72" :key="item.value" :value="item.value">{{ item.descripcion }}
+                    </option>
+                  </select>
+                  <label for="floatingSelect">Anexos disponibles para la Resolucion 72</label>
+                </div>
+              </div>
+              <div class="col-md-6" v-else>
+                <h5>No le corresponde anexo a esta proforma</h5>
+              </div>
+<!--              RENDERIZADO DEL ANEXO 71 MUSICA-->
+              <div v-if="indicadorAnexo==1">
+                <h4>Anexo Musica</h4>
+                <form class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"  class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.modalidad">
+                        <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Modalidad</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.tipoMusica">
+                        <option v-for="item in CHOICES[11].TIPO_OBRA_COMERCIAL" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Tipo de Musica</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de pago</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de entrega</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  hidden readonly id="contratoAnexo71Musica"
+                                                       v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                  </div>
+                  <div v-if="objProforma.tipoProforma!=1" class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
+                                                      placeholder="Nombre"> <label for="floatingName">Juridico</label></div>
+                  </div >
+                  <div class="text-center">
+                    <button @click="POST_PUT('licenciamiento/anexo71Musica/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
+                      <i class="bi bi-arrow-bar-right"></i> Salvar </button>
+                    <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  </div>
+                </form>
+                <hr>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Acciones</th>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Modalidad</th>
+                      <th scope="col">Tipo de musica</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo71MusicaAPI" :key="item.id">
+                      <td>
+                        <span class="sombra badge bg-primary"  title="Modificar" @click="editarAnexo(`licenciamiento/anexo71Musica/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                      </td>
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.modalidad }}</td>
+                      <td>{{ item.tipoMusica }}</td>
+                      <td>{{ item.tarifa }}</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="text-center">
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Musica"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                </div>
+              </div>
+
+<!--              RENDERIZADO DEL ANEXO 71 AUDIOVISUAL-->
+              <div v-if="indicadorAnexo==2">
+                <h4>Anexo AudioVisual</h4>
+                <form class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.categoriaAudiovisual">
+                        <option v-for="item in CHOICES[14].TIPO_CATEGORIA_AUDIOVISUAL" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Tipo de Categoria</label>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de pago</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de entrega</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
+                                                      placeholder="Nombre"> <label for="floatingName">Juridico</label></div>
+                  </div>
+                  <div class="text-center">
+                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                      <i class="bi bi-arrow-bar-right"></i> Salvar </button>
+                    <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  </div>
+                </form>
+              </div>
+
+<!--              RENDERIZADO DEL ANEXO 72 CIMEX-->
+              <div v-if="indicadorAnexo==4">
+                <h4>Anexo CIMEX</h4>
+                <form class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacionModalidad"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Locacion/Modalidad</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.cantidadPlazas"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Cantidad de Plazas</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importe"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Importe</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de pago</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de entrega</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                  </div>
+                  <div class="text-center">
+                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                      <i class="bi bi-arrow-bar-right"></i> Salvar </button>
+                    <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  </div>
+                </form>
+              </div>
+
+<!--              RENDERIZADO DEL ANEXO 72 GAVIOTA-->
+              <div v-if="indicadorAnexo==5">
+                <h4>Anexo Gaviota</h4>
+                <form class="row g-3">
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.categoria"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Categoria</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.numeroHabitacion"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Numero de Habitaciones</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.periodo"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Periodo</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaTemporadaAlta"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Temp. Alta</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaTemporadaBaja"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Temp. Baja</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaOcupacionInferior"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Ocupacion inferior del 30%</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaAlta"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Importe Temp. Alta</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaBaja"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Importe Temp. Baja</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaOcupacionInferior"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Importe Ocupacion inferior del 30%</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de pago</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de entrega</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                  </div>
+                  <div class="text-center">
+                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                      <i class="bi bi-arrow-bar-right"></i> Salvar </button>
+                    <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  </div>
+                </form>
+              </div>
+
+<!--              RENDERIZADO DEL ANEXO 72 TRD-->
+              <div v-if="indicadorAnexo==6">
+                <h4>Anexo TRD</h4>
+                <form class="row g-3">
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.modalidad"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Modalidad</label></div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importe"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName">Importe</label></div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de pago</label>
+                    </div>
+                  </div>
+                  <div class="col-md-3">
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Periocidad de entrega</label>
+                    </div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                  </div>
+                  <div class="text-center">
+                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                      <i class="bi bi-arrow-bar-right"></i> Salvar </button>
+                    <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  </div>
+                </form>
+              </div>
+            </div>
             <h5 v-if="currentTabIndex === 4">Tab 4</h5>
           </Wizard>
         </div>
@@ -1371,6 +1840,12 @@ onMounted(() => {
   box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
 }
 .miBtn:hover{
+  box-shadow: none;
+}
+.sombra {
+  box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
+}
+.sombra:hover {
   box-shadow: none;
 }
 </style>
