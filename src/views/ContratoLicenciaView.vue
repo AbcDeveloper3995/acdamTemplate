@@ -119,6 +119,10 @@ const dataAnexoPost = ref({
   categoriaAudiovisual:''
 })
 const anexo71MusicaAPI = ref([])
+const anexo71AudiovisualAPI = ref([])
+const anexo72CimexAPI = ref([])
+const anexo72GaviotaAPI = ref([])
+const anexo72TrdAPI = ref([])
 let currentTabIndex = 0                        //variable que funciona como indice del wizard
 
 //PARA EL WIZARD
@@ -355,11 +359,27 @@ const agingarValorIndicadorAnexo = (event) => {
 
 // FUNCION PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
 const actualizarAnexos71Musica = () => GET('licenciamiento/anexo71Musica/', anexo71MusicaAPI)
+const actualizarAnexos71Audiovisual = () => GET('licenciamiento/anexo71Audiovisual/', anexo71AudiovisualAPI)
+const actualizarAnexos72Cimex = () => GET('licenciamiento/anexo72Cimex/', anexo72CimexAPI)
+const actualizarAnexos72Gaviota = () => GET('licenciamiento/anexo72Gaviota/', anexo72GaviotaAPI)
+const actualizarAnexos72Trd = () => GET('licenciamiento/anexo72Trd/', anexo72TrdAPI)
 
 // FUNCION PARA REASIGNAR EL ID AL CAMPO CONTRATO DEL ANEXO
 const asignarIdAlCampoContratoDelAnexo = () => {
-  let element = document.getElementById('contratoAnexo71Musica')
-  element.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
+  let contratoAnexo71Musica = document.getElementById('contratoAnexo71Musica')
+  let contratoAnexo71Audiovisual = document.getElementById('contratoAnexo71Audiovisual')
+  let contratoAnexo72Cimex = document.getElementById('contratoAnexo72Cimex')
+  let contratoAnexo72Gaviota = document.getElementById('contratoAnexo72Gaviota')
+  let contratoAnexo72Trd = document.getElementById('contratoAnexo72Trd')
+  contratoAnexo71Musica.value!=null?contratoAnexo71Musica.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  contratoAnexo71Audiovisual.value!=null?contratoAnexo71Audiovisual.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  contratoAnexo72Cimex.value!=null?contratoAnexo72Cimex.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  contratoAnexo72Trd.value!=null?contratoAnexo72Trd.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  contratoAnexo71Musica.value!=null?contratoAnexo71Musica.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  // contratoAnexo71Audiovisual.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
+  // contratoAnexo72Cimex.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
+  // contratoAnexo72Gaviota.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
+  // contratoAnexo72Trd.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
 }
 
 //FUNCION QUE BUSCA EL ANEXO A EDITAR Y PINTAR SUS DATOS EN EL FORMULARIO PARA SU POSTERIOR EDICION
@@ -367,16 +387,28 @@ const editarAnexo = async (url, index) => {
   indice.value = index
   axios.get(url)
       .then((response) => {
-        console.log(response.data)
         dataAnexoPost.value.pk = response.data.data.id
         dataAnexoPost.value.fk_contratoLicenciaEstatal = response.data.data.fk_contratoLicenciaEstatal
         dataAnexoPost.value.fk_contratoLicenciaPersonaJ = response.data.data.fk_contratoLicenciaPersonaJ
         dataAnexoPost.value.locacion = response.data.data.locacion
+        dataAnexoPost.value.locacionModalidad = response.data.data.locacionModalidad
         dataAnexoPost.value.tarifa = response.data.data.tarifa
         dataAnexoPost.value.periocidadPago = response.data.data.periocidadPago
         dataAnexoPost.value.tipoMusica = response.data.data.tipoMusica
         dataAnexoPost.value.modalidad = response.data.data.modalidad
         dataAnexoPost.value.periocidadEntrega = response.data.data.periocidadEntrega
+        dataAnexoPost.value.categoriaAudiovisual = response.data.data.categoriaAudiovisual
+        dataAnexoPost.value.cantidadPlazas = response.data.data.cantidadPlazas
+        dataAnexoPost.value.importe = response.data.data.importe
+        dataAnexoPost.value.categoria = response.data.data.categoria
+        dataAnexoPost.value.numeroHabitacion = response.data.data.numeroHabitacion
+        dataAnexoPost.value.periodo = response.data.data.periodo
+        dataAnexoPost.value.tarifaTemporadaAlta = response.data.data.tarifaTemporadaAlta
+        dataAnexoPost.value.tarifaTemporadaBaja = response.data.data.tarifaTemporadaBaja
+        dataAnexoPost.value.tarifaOcupacionInferior = response.data.data.tarifaOcupacionInferior
+        dataAnexoPost.value.importeTemporadaAlta = response.data.data.importeTemporadaAlta
+        dataAnexoPost.value.importeTemporadaBaja = response.data.data.importeTemporadaBaja
+        dataAnexoPost.value.importeTemporadaOcupacionInferior = response.data.data.importeTemporadaOcupacionInferior
       })
       .catch((error) => {
         mensaje('error','Error', error.response.data.error)
@@ -1546,7 +1578,7 @@ onMounted(() => {
                 <h4>Anexo AudioVisual</h4>
                 <form class="row g-3">
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                    <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacion"
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
                   </div>
@@ -1583,21 +1615,53 @@ onMounted(() => {
                     </div>
                   </div>
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
-                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                    <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                      hidden readonly id="contratoAnexo71Audiovisual"
+                                                      v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"></div>
                   </div>
-                  <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                  <div v-if="objProforma.tipoProforma!=1" class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" readonly
                                                       id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
                                                       placeholder="Nombre"> <label for="floatingName">Juridico</label></div>
-                  </div>
+                  </div >
                   <div class="text-center">
-                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <button @click="POST_PUT('licenciamiento/anexo71Audiovisual/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                       <i class="bi bi-arrow-bar-right"></i> Salvar </button>
                     <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                   </div>
                 </form>
+                <hr>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Acciones</th>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Categoria</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo71AudiovisualAPI" :key="item.id">
+                      <td>
+                        <span class="sombra badge bg-primary"  title="Modificar" @click="editarAnexo(`licenciamiento/anexo71Audiovisual/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                      </td>
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.categoriaAudiovisual }}</td>
+                      <td>{{ item.tarifa }}</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="text-center">
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Audiovisual"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                </div>
               </div>
 
 <!--              RENDERIZADO DEL ANEXO 72 CIMEX-->
@@ -1605,7 +1669,7 @@ onMounted(() => {
                 <h4>Anexo CIMEX</h4>
                 <form class="row g-3">
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacionModalidad"
+                    <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacionModalidad"
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName">Locacion/Modalidad</label></div>
                   </div>
@@ -1643,16 +1707,50 @@ onMounted(() => {
                     </div>
                   </div>
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
-                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                    <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                      hidden readonly id="contratoAnexo72Cimex"
+                                                      v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"></div>
                   </div>
                   <div class="text-center">
-                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <button @click="POST_PUT('licenciamiento/anexo72Cimex/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                       <i class="bi bi-arrow-bar-right"></i> Salvar </button>
                     <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                   </div>
                 </form>
+                <hr>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Acciones</th>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Cantidad de plazas</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Importe</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72CimexAPI" :key="item.id">
+                      <td>
+                        <span class="sombra badge bg-primary"  title="Modificar" @click="editarAnexo(`licenciamiento/anexo72Cimex/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                      </td>
+                      <td>{{ item.locacionModalidad }}</td>
+                      <td>{{ item.cantidadPlazas }}</td>
+                      <td>{{ item.tarifa }}</td>
+                      <td>{{ item.importe }}</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="text-center">
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Cimex"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                </div>
               </div>
 
 <!--              RENDERIZADO DEL ANEXO 72 GAVIOTA-->
@@ -1660,9 +1758,14 @@ onMounted(() => {
                 <h4>Anexo Gaviota</h4>
                 <form class="row g-3">
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.categoria"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Categoria</label></div>
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.categoria" @click="asignarIdAlCampoContratoDelAnexo">
+                        <option value="">-----------</option>
+                        <option v-for="item in CHOICES[14].TIPO_CATEGORIA_HOTELES" :key="item.value" :value="item.value">{{ item.descripcion }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Categoria</label>
+                    </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.numeroHabitacion"
@@ -1723,16 +1826,60 @@ onMounted(() => {
                     </div>
                   </div>
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
-                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                    <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                      hidden readonly id="contratoAnexo72Gaviota"
+                                                      v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"></div>
                   </div>
                   <div class="text-center">
-                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <button @click="POST_PUT('licenciamiento/anexo72Gaviota/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                       <i class="bi bi-arrow-bar-right"></i> Salvar </button>
                     <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                   </div>
                 </form>
+                <hr>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Acciones</th>
+                      <th scope="col">Categoria</th>
+                      <th scope="col">No. Habitaciones</th>
+                      <th scope="col">Periodo</th>
+                      <th scope="col">Tarifa Temp. Alta</th>
+                      <th scope="col">Tarifa temp. Baja</th>
+                      <th scope="col">Tarifa ocupacion inferior al 30%</th>
+                      <th scope="col">Importe Temp. Alta</th>
+                      <th scope="col">Importe temp. Baja</th>
+                      <th scope="col">Importe ocupacion inferior al 30%</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
+                      <td>
+                        <span class="sombra badge bg-primary"  title="Modificar" @click="editarAnexo(`licenciamiento/anexo72Gaviota/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                      </td>
+                      <td>{{ item.categoria }}</td>
+                      <td>{{ item.numeroHabitacion }}</td>
+                      <td>{{ item.periodo }}</td>
+                      <td>{{ item.tarifaTemporadaAlta }}</td>
+                      <td>{{ item.tarifaTemporadaBaja }}</td>
+                      <td>{{ item.tarifaOcupacionInferior }}</td>
+                      <td>{{ item.importeTemporadaAlta }}</td>
+                      <td>{{ item.importeTemporadaBaja }}</td>
+                      <td>{{ item.importeTemporadaOcupacionInferior }}</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="text-center">
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Gaviota"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                </div>
               </div>
 
 <!--              RENDERIZADO DEL ANEXO 72 TRD-->
@@ -1740,14 +1887,18 @@ onMounted(() => {
                 <h4>Anexo TRD</h4>
                 <form class="row g-3">
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                    <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacion"
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.modalidad"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Modalidad</label></div>
+                    <div class="form-floating mb-3">
+                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.modalidad">
+                        <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                        </option>
+                      </select>
+                      <label for="floatingSelect">Modalidad</label>
+                    </div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
@@ -1778,16 +1929,50 @@ onMounted(() => {
                     </div>
                   </div>
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
-                                                      id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
-                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                    <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                      hidden readonly id="contratoAnexo72Trd"
+                                                      v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                      placeholder="Nombre"></div>
                   </div>
                   <div class="text-center">
-                    <button @click="POST_PUT('licenciamiento/utilizador/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <button @click="POST_PUT('licenciamiento/anexo72Trd/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                       <i class="bi bi-arrow-bar-right"></i> Salvar </button>
                     <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                   </div>
                 </form>
+                <hr>
+                <div class="table-responsive">
+                  <table class="table table-striped">
+                    <thead>
+                    <tr>
+                      <th scope="col">Acciones</th>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Modalidad</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Importe</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72TrdAPI" :key="item.id">
+                      <td>
+                        <span class="sombra badge bg-primary"  title="Modificar" @click="editarAnexo(`licenciamiento/anexo72Trd/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                      </td>
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.modalidad }}</td>
+                      <td>{{ item.tarifa }}</td>
+                      <td>{{ item.importe }}</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <div class="text-center">
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Trd"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                </div>
               </div>
             </div>
             <h5 v-if="currentTabIndex === 4">Tab 4</h5>

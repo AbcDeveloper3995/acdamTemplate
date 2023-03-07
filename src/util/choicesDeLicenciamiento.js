@@ -106,6 +106,13 @@ const CHOICES = [
         TIPO_CATEGORIA_AUDIOVISUAL: [
             {value: '1', descripcion: 'Sala de Cine'},
             {value: '2', descripcion: 'Sala de Video'},
+        ],
+
+        TIPO_CATEGORIA_HOTELES: [
+            {value: '2estrellas', descripcion: '2 Estrellas'},
+            {value: '3estrellas', descripcion: '3 Estrellas'},
+            {value: '4estrellas', descripcion: '4 Estrellas'},
+            {value: '5estrellas', descripcion: '5 Estrellas'},
         ]
     },
 ]
