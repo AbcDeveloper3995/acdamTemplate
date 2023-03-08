@@ -478,7 +478,7 @@ onMounted(() => {
                                     title: 'Datos del contrato',
                                   },
                                   {
-                                    title: 'Formatear y Exportar a PDF',
+                                    title: 'Formatear y Exportar',
                                   },
                                   {
                                     title: 'Datos del anexo',
@@ -1727,7 +1727,7 @@ onMounted(() => {
                     <thead>
                     <tr>
                       <th scope="col">Acciones</th>
-                      <th scope="col">Locacion</th>
+                      <th scope="col">Locacion/Modalidad</th>
                       <th scope="col">Cantidad de plazas</th>
                       <th scope="col">Tarifa</th>
                       <th scope="col">Importe</th>
@@ -1980,6 +1980,7 @@ onMounted(() => {
             </div>
 
 <!--            PROCESO PARA EL PASO 5-->
+<!--            PARA ANEXO MUSICA-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==1">
               <h5>ANEXO MUSICA</h5>
               <section id="AnexoMusica">
@@ -2041,6 +2042,8 @@ onMounted(() => {
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
+
+<!--            PARA ANEXO AUDIOVISUAL-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==2">
               <h5>ANEXO audiovisual</h5>
               <section id="AnexoAudiovisual">
@@ -2096,6 +2099,8 @@ onMounted(() => {
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
+
+<!--            PARA ANEXO CULTURA-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==3">
               <h5>ANEXO cultura</h5>
               <section id="AnexoCultura">
@@ -2201,15 +2206,199 @@ onMounted(() => {
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
+
+<!--            PARA ANEXO CIMEX-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==4">
-
+              <h5>ANEXO CIMEX</h5>
+              <section id="AnexoCimex">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="text-center" ><strong>ANEXO No.1 DEL CONTRATO-LICENCIA PARA LA EJECUCIÓN DE OBRAS CIMEX S.A.
+                    Y LA  AGENCIA CUBANA DE DERECHO DE AUTOR MUSICAL (ACDAM).</strong></h5>
+                  <img src="../assets/img/acdamlogo.jpg">
+                </div>
+                <br>
+                <br>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="border-color: black">
+                    <thead>
+                    <tr>
+                      <th scope="col">Locacion/Modalidad</th>
+                      <th scope="col">Cantidad de Plazas</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Importe</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Entrega de informacion</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72CimexAPI" :key="item.id">
+                      <td>{{ item.locacionModalidad }}</td>
+                      <td>{{ item.cantidadPlazas }}</td>
+                      <td>{{ item.tarifa }}%</td>
+                      <td>{{ item.importe }}%</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <br>
+                <br>
+                <h4>Y como muestra de conformidad y aceptación las partes firman el presente Anexo, que forma parte integrante del
+                  contrato licencia que le antecede, a los  {{dia}} días del mes de {{mes}} de {{ano}}.</h4>
+                <br>
+                <br>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>POR LA ACDAM:</p>
+                  <p>POR EL UTILIZADOR:</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>_______________________ </p>
+                  <p>_______________________ </p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>Director René Hernández Quintero </p>
+                  <p>Gerente Comercial</p>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoCimex')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
             </div>
+
+<!--            PARA ANEXO GAVIOTA-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==5">
+              <h5>ANEXO GAVIOTA</h5>
+              <section id="AnexoGaviota">
+                <div v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
+                <h4>Categoria: {{item.categoria}} </h4>
+                <h4>No. Habitaciones: {{item.numeroHabitacion}}</h4>
+                </div>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="border-color: black">
+                    <thead>
+                    <tr>
+                      <th rowspan="3">Periodo</th>
+                      <th colspan="4">FACTURACIÓN MENSUAL</th>
+                      <th rowspan="3">Periodicidad de los pagos</th>
+                      <th rowspan="3">Periodicidad en la entrega de la información</th>
+                    </tr>
+                    <tr>
+                      <th colspan="4">tarifas por habitaciones físicas </th>
+                    </tr>
+                    <tr>
+                      <th>Criterio</th>
+                      <th>temporada alta (01/11 - 30/04)</th>
+                      <th>temporada baja (01/05 - 31/10)</th>
+                      <th>Ocupación por debajo del 30 %</th>
+                    </tr>
 
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
+                      <td rowspan="2">{{ item.periodo }}</td>
+                      <td>Tarifa</td>
+                      <td>{{ item.tarifaTemporadaAlta }}</td>
+                      <td>{{ item.tarifaTemporadaBaja }}%</td>
+                      <td>{{ item.tarifaOcupacionInferior }}%</td>
+                      <td rowspan="2">{{ item.periocidadPago }}</td>
+                      <td rowspan="2">{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    <tr v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
+                      <td>Importe</td>
+                      <td>{{ item.importeTemporadaAlta }}%</td>
+                      <td>{{ item.importeTemporadaBaja }}%</td>
+                      <td>{{ item.importeTemporadaOcupacionInferior}}%</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <br>
+                <br>
+                <h4>Y como muestra de conformidad y aceptación las partes firman el presente Anexo, que forma parte integrante del
+                  contrato licencia que le antecede, a los  {{dia}} días del mes de {{mes}} de {{ano}}.</h4>
+                <br>
+                <br>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>POR LA ACDAM:</p>
+                  <p>POR EL UTILIZADOR:</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>_______________________ </p>
+                  <p>_______________________ </p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>Director René Hernández Quintero </p>
+                  <p></p>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoGaviota')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
             </div>
+
+<!--            PARA ANEXO TRD-->
             <div v-if="currentTabIndex === 4 && indicadorAnexo==6">
-
+              <h5>ANEXO TRD</h5>
+              <section id="AnexoTRD">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="text-center" ><strong>ANEXO No. 1 DEL CONTRATO-LICENCIA PARA LA COMUNICACIÓN PÚBLICA DE
+                    OBRAS MUSICALES ENTRE TIENDA CARIBE Y LA AGENCIA CUBANA DE DERECHO DE AUTOR MUSICAL (ACDAM)</strong></h5>
+                  <img src="../assets/img/acdamlogo.jpg">
+                </div>
+                <br>
+                <br>
+                <h5 class="text-center">UNIDADES AUTORIZADAS A UTILIZAR OBRAS MUSICALES EN SU ACTIVIDAD COMERCIAL.</h5>
+                <br>
+                <br>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="border-color: black">
+                    <thead>
+                    <tr>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Modalidad</th>
+                      <th scope="col">Importe a pagar según la tarifa establecida</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo72TrdAPI" :key="item.id">
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.modalidad }}</td>
+                      <td>{{ item.importe }}%</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <br>
+                <br>
+                <h5>En la Habana, a los  {{dia}} días del mes de {{mes}} de {{ano}}.</h5>
+                <br>
+                <br>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>POR LA ACDAM:</p>
+                  <p>POR EL UTILIZADOR:</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>_______________________ </p>
+                  <p>_______________________ </p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>Director René Hernández Quintero </p>
+                  <p></p>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoTRD')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
             </div>
+
           </Wizard>
         </div>
         <hr>
