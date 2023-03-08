@@ -123,6 +123,7 @@ const anexo71AudiovisualAPI = ref([])
 const anexo72CimexAPI = ref([])
 const anexo72GaviotaAPI = ref([])
 const anexo72TrdAPI = ref([])
+const nombreUtilizador = ref()
 let currentTabIndex = 0                        //variable que funciona como indice del wizard
 
 //PARA EL WIZARD
@@ -133,6 +134,7 @@ const onChangeCurrentTab = (index, oldIndex) => {
     let url = `licenciamiento/contratoLicenciaEstatal/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
+          nombreUtilizador.value = response.data.utilizador
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
                                    <h3><strong>DE OTRA PARTE:</strong> La ${response.data.utilizador} creada por la ${response.data.resolucionUtilizador}, de fecha ${response.data.fechaResolucionUtilizador}, por ${response.data.emisionResolucionUtilizador}, con domicilio legal en ${response.data.direccion} municipio ${response.data.municipio}, provincia ${response.data.provincia}, con Codigo REEUP ${response.data.codigoREEUP}, NIT ${response.data.nit} y Cuenta Bancaria en CUP No.${response.data.cuentaBancaria}, Titular: ${response.data.titular}, en el Banco de Credito y Comercio ${response.data.banco}, Sucursal ${response.data.sucursal}, sita en ${response.data.direccionBanco}, que en lo adelante se denominara a los efectos de este contrato, <strong>UTILIZADOR</strong>, representado en este cargo por ${response.data.nombreFirmanteContrato}, en su condicion de ${response.data.cargoFirmanteContrato} designado en este cargo por la Resolucion No. ${response.data.resolucionFirmante}, de fecha ${response.data.fechaResolucionFirmante}, emitido por el ${response.data.emitido}</h3>
                                    <h3>${response.data.descripcion}</h3>
@@ -282,7 +284,8 @@ const onTabBeforeChange = () => {
   alert('All Tabs')
 }
 const wizardCompleted = () => {
-  alert('Wizard Completed')
+  mensaje('success','Exito', 'Proceso de generacion de contrato de licencia concluido correctamente.')
+  router.push('/home')
 }
 
 //FUNCION PAR ALA OBTENCION DEL UTILIZADOR SELECCIONADO EN EL PASO 1 DEL WIZARD Y LAS PROFORMAS CORRESPONDIENTES A ESE UTILIZADOR
@@ -340,11 +343,11 @@ const mes = date.toLocaleString('default',{month:'long'})
 const ano = date.getFullYear()
 
 //FUNCION PARA GENERAR EL PDF
-const PDF = () => {
-  let content = document.getElementById('pdf')
+const PDF = (idElemento) => {
+  let content = document.getElementById(`${idElemento}`)
   let options = {
     margin:       0.6,
-    filename:     `${lastContrato.value.titulo}.pdf`,
+    filename:     `${idElemento}.pdf`,
     image:        { type: 'jpeg', quality: 0.98 },
     html2canvas:  { scale: 3 },
     jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -1298,7 +1301,7 @@ onMounted(() => {
 
             <!--            PROCESO PARA EL PASO 3-->
             <div v-if="currentTabIndex === 2" >
-              <section id="pdf">
+              <section :id="lastContrato.titulo">
 <!--                PDF A GENRAR SI ES ESTATAL-->
                 <div v-if="objProforma.tipoProforma == 1">
                   <div class="d-flex align-items-center justify-content-between">
@@ -1441,7 +1444,7 @@ onMounted(() => {
                 </div>
               </section>
               <div class="text-center">
-                <button @click="PDF" class="miBtn btn btn-outline-light" type="button">
+                <button @click="PDF(`${lastContrato.titulo}`)" class="miBtn btn btn-outline-light" type="button">
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
@@ -1975,7 +1978,238 @@ onMounted(() => {
                 </div>
               </div>
             </div>
-            <h5 v-if="currentTabIndex === 4">Tab 4</h5>
+
+<!--            PROCESO PARA EL PASO 5-->
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==1">
+              <h5>ANEXO MUSICA</h5>
+              <section id="AnexoMusica">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="text-center" ><strong>ANEXO No. 1 DEL CONTRATO-LICENCIA PARA LA EJECUCIÓN PÚBLICA DE OBRAS MUSICALES
+                    ENTRE <span class="text-uppercase">{{ nombreUtilizador }}</span>  Y LA  AGENCIA CUBANA DE DERECHO DE AUTOR MUSICAL (ACDAM).</strong></h5>
+                  <img src="../assets/img/acdamlogo.jpg">
+                </div>
+                <br>
+                <br>
+                <h4 class="text-center">Relación de locaciones donde se efectúa la ejecución pública de obras musicales.</h4>
+                <br>
+                <br>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="border-color: black">
+                    <thead>
+                    <tr>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Modalidad</th>
+                      <th scope="col">Tipo de musica</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo71MusicaAPI" :key="item.id">
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.modalidad }}</td>
+                      <td>{{ item.tipoMusica }}</td>
+                      <td>{{ item.tarifa }}%</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <br>
+                <br>
+                <h4>Y como muestra de conformidad y aceptación las partes firman el presente Anexo, que forma parte integrante del
+                  contrato licencia que le antecede, a los  {{dia}} días del mes de {{mes}} de {{ano}}.</h4>
+                <br>
+                <br>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>POR LA ACDAM:</p>
+                  <p>POR EL UTILIZADOR:</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>_______________________ </p>
+                  <p>_______________________ </p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>Director René Hernández Quintero </p>
+                  <p></p>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoMusica')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
+            </div>
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==2">
+              <h5>ANEXO audiovisual</h5>
+              <section id="AnexoAudiovisual">
+                <div class="d-flex align-items-center justify-content-between">
+                  <h5 class="text-center" ><strong>ANEXO No. 1 DEL CONTRATO-LICENCIA PARA LA EJECUCIÓN PÚBLICA DE OBRAS AUDIOVISUALES
+                    ENTRE <span class="text-uppercase">{{ nombreUtilizador }}</span>  Y LA  AGENCIA CUBANA DE DERECHO DE AUTOR MUSICAL (ACDAM).</strong></h5>
+                  <img src="../assets/img/acdamlogo.jpg">
+                </div>
+                <br>
+                <br>
+                <h4 class="text-center">Relación de locaciones donde se efectúa la exhibición de obras audiovisuales.</h4>
+                <br>
+                <br>
+                <div class="table-responsive">
+                  <table class="table table-bordered" style="border-color: black">
+                    <thead>
+                    <tr>
+                      <th scope="col">Locacion</th>
+                      <th scope="col">Categoria</th>
+                      <th scope="col">Tarifa</th>
+                      <th scope="col">Periocidad de Pago</th>
+                      <th scope="col">Periocidad de Entrega</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr v-for="(item, index) in anexo71AudiovisualAPI" :key="item.id">
+                      <td>{{ item.locacion }}</td>
+                      <td>{{ item.categoriaAudiovisual }}</td>
+                      <td>{{ item.tarifa }}%</td>
+                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadEntrega }}</td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <br>
+                <br>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>POR LA ACDAM:</p>
+                  <p>POR EL UTILIZADOR:</p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>_______________________ </p>
+                  <p>_______________________ </p>
+                </div>
+                <div class="d-flex align-items-center justify-content-between">
+                  <p>Director René Hernández Quintero </p>
+                  <p></p>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoAudiovisual')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
+            </div>
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==3">
+              <h5>ANEXO cultura</h5>
+              <section id="AnexoCultura">
+                <h4 class="text-center">Relación de locaciones donde se efectúa la ejecución pública de obras musicales.</h4>
+                <br>
+                <table class="table table-bordered" style="border: black">
+                  <thead>
+                  <tr>
+                    <th >Locacion</th>
+                    <th >Modalidad</th>
+                    <th >Musica viva</th>
+                    <th >Musica grabada</th>
+                    <th >Importe a pagar según la tarifa establecida</th>
+                    <th >Periodicidad y fecha de pago </th>
+                    <th >Periodicidad en la entrega de la información </th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td rowspan="7">Instituciones culturales y áreas abiertas: Casas de Cultura, galerías de arte,
+                      bibliotecas, museos, anfiteatro, teatros, plazas u otras.</td>
+                    <td>Concierto de música popular con cobro de entrada</td>
+                    <td>X</td>
+                    <td></td>
+                    <td>4% de los ingresos brutos por cobro de entrada4% de los ingresos brutos por cobro de entrada</td>
+                    <td rowspan="8">Mensual: dentro de los 30 días naturales posteriores a la fecha de entrega de la factura</td>
+                    <td rowspan="8">Trimestral
+                      (música viva)
+                      Bianual
+                      (música grabada)
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>Baile público con cobro de entrada</td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>4% de los ingresos brutos por cobro de entrada4% de los ingresos brutos por cobro de entrada</td>
+                  </tr>
+                  <tr>
+                    <td>Bailable público sin cobro de entrada, uso de música grabada en cualquier lugar sin cobro de entrada</td>
+                    <td></td>
+                    <td>X</td>
+                    <td>13.50 CUP por título ejecutado. Se considerará que cada título ejecutado dura 6 minutos.</td>
+                  </tr>
+                  <tr>
+                    <td>Recital / Pequeño Recital</td>
+                    <td>X</td>
+                    <td></td>
+                    <td>$4.50 CUP por título ejecutado</td>
+                  </tr>
+                  <tr>
+                    <td>Mini espectáculo al aire libre</td>
+                    <td></td>
+                    <td>X</td>
+                    <td>$15.00 CUP por actividad</td>
+                  </tr>
+                  <tr>
+                    <td rowspan="2">Festivales y espectáculos musicales, semanas de la cultura, jornadas y eventos culturales </td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>6% de los ingresos brutos por cobro de entrada</td>
+                  </tr>
+                  <tr>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>4% del total pagado a las unidades artísticas que actúen en las áreas*</td>
+                  </tr>
+                  <tr>
+                    <td>Actividades de Banda Municipal de Conciertos, Orquesta Sinfónica, de Cámara y similares</td>
+                    <td>Concierto</td>
+                    <td>X</td>
+                    <td></td>
+                    <td>2.25 por minuto de ejecución (si el título excede de 20 minutos el pago se mantiene en $45.00</td>
+                  </tr>
+                  <tr>
+                    <td>Carnaval Área de Carnaval</td>
+                    <td>Carnaval</td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>4% de los ingresos brutos por cobro de entrada4% de los ingresos brutos por cobro de entrada</td>
+                    <td rowspan="3">Dentro de los 30 días naturales posteriores a la fecha de entrega de la factura</td>
+                    <td rowspan="3">Dentro de los 60 días naturales posteriores a la conclusión del evento</td>
+                  </tr>
+                  <tr>
+                    <td>Bailables con cobro de entrada</td>
+                    <td>Carnaval</td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>4% de los ingresos brutos por cobro de entrada4% de los ingresos brutos por cobro de entrada</td>
+                  </tr>
+                  <tr>
+                    <td>Bailables en áreas abiertas</td>
+                    <td>Carnaval</td>
+                    <td>X</td>
+                    <td>X</td>
+                    <td>4% de los ingresos brutos por cobro de entrada4% de los ingresos brutos por cobro de entrada</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </section>
+              <div class="text-center">
+                <button @click="PDF('AnexoCultura')" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
+            </div>
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==4">
+
+            </div>
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==5">
+
+            </div>
+            <div v-if="currentTabIndex === 4 && indicadorAnexo==6">
+
+            </div>
           </Wizard>
         </div>
         <hr>
