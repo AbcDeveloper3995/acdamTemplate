@@ -1,43 +1,44 @@
 <script setup>
 import axios from "axios";
 import html2pdf from  'html2pdf.js'
+
 import {QuillEditor} from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.bubble.css'
-
 import 'form-wizard-vue3/dist/form-wizard-vue3.css';
 import Wizard from 'form-wizard-vue3';
-import Base from "@/components/base/Base.vue";
 import {computed, onMounted, ref} from "vue";
 import {useRouter} from "vue-router";
 
+import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import CHOICES from '../util/choicesDeLicenciamiento'
 import {GET, POST_PUT, DELETE, indiceActualizado} from '../util/peticionesServer'
+import {dia, mes, ano, PDF} from '../util/functiosGlobal'
 
 //DECLARACIONES
 const router =useRouter()
 const {mensaje} = notificaciones()
 const indice = indiceActualizado                //VARIABLE QUE CONTROLA EL COMPORTAMIENTO DEL FORMULARIO DEPENDIENDO SI SE CREAR O SE EDITA
-const utilizadorAPI = ref([])             //variable que almacenara un listado de utilizadores
-const representanteAPI = ref([])          //variable que almacenara un listado de representantes
-const proformaAPI = ref([])               //variable que almacenara un listado de proformas
-const contratoLicEstatalAPI = ref([])     //variable que almacenara un listado de contratos
-const municipioAPI = ref([])              //variable que almacenara un listado de municipios
-const modalidadAPI = ref([])              //variable que almacenara un listado de las modalidades
+const utilizadorAPI = ref([])
+const representanteAPI = ref([])
+const proformaAPI = ref([])
+const contratoLicEstatalAPI = ref([])
+const municipioAPI = ref([])
+const modalidadAPI = ref([])
 const objProforma = ref({
   pk:'',
   nombre:'',
   tipoProforma:'',
   resolucion:''
-})           //variable que almacenara un objeto proforma
+})
 const objUtilizador = ref({
   pk:'',
   tipo:'',
   tipoNoEstatal:'',
   sector:'',
   derecho:''
-})         //variable que almacenara un objeto Utilizador
+})
 const dataPost = ref({
   pk: '',
   fk_proforma: '',
@@ -84,14 +85,14 @@ const dataPost = ref({
   ejecucionObrasComercial: '',
   email: '',
   telefono: '',
-})              //variable que almacenara la data del contrato(Paso 2) a enviar (para cuando es estatal)
+})
 const lastContrato = ref({
   pk:'',
   titulo:'',
   descripcion:'',
   numeroLicencia:'',
   codigo:'',
-})      //variable que almacenara el ultimo contrato creado
+})
 const contratoFormato = ref('')
 const indicadorAnexo = ref(0)
 const dataAnexoPost = ref({
@@ -124,6 +125,7 @@ const anexo72CimexAPI = ref([])
 const anexo72GaviotaAPI = ref([])
 const anexo72TrdAPI = ref([])
 const nombreUtilizador = ref()
+
 let currentTabIndex = 0                        //variable que funciona como indice del wizard
 
 //PARA EL WIZARD
@@ -336,29 +338,8 @@ const getMunicipios = (event) => {
       })
 }
 
-//DECLARACION DEL OBJETO DATE QUE ES UTILIZADO EN EL ULTIMO PARRAFO DEL CONTRATO (PASO 3)
-const date = new Date()
-const dia = date.getDate()
-const mes = date.toLocaleString('default',{month:'long'})
-const ano = date.getFullYear()
-
-//FUNCION PARA GENERAR EL PDF
-const PDF = (idElemento) => {
-  let content = document.getElementById(`${idElemento}`)
-  let options = {
-    margin:       0.6,
-    filename:     `${idElemento}.pdf`,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 3 },
-    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-  };
-  html2pdf().from(content).set(options).save();
-}
-
 //FUNCION PARA RENDERIZAR EL FORMULARIO DE ANEXO SEGUN EL ANEXO SELECCIONADO
-const agingarValorIndicadorAnexo = (event) => {
-  indicadorAnexo.value = event.target.value
-}
+const agingarValorIndicadorAnexo = (event) => indicadorAnexo.value = event.target.value
 
 // FUNCION PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
 const actualizarAnexos71Musica = () => GET('licenciamiento/anexo71Musica/', anexo71MusicaAPI)
