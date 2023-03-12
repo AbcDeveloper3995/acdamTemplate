@@ -9,15 +9,15 @@ import {RouterLink} from 'vue-router'
       <li class="nav-item"><a class="nav-link "><i class="bi bi-people"></i><RouterLink to="/concepto">Conceptos</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-device-ssd"></i><RouterLink to="/modalidad">Modalidad</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-grid"></i><RouterLink to="/sector">Sector</RouterLink></a></li>
-      <span class="nav-heading text-black" style="font-size: 15px">Proceso Licenciamiento</span>
+      <span class="nav-heading text-black" style="font-size: 15px">Licenciamiento</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-alarm-fill"></i><RouterLink to="/utilizador">Utilizador</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-robot"></i><RouterLink to="/representante">Representante</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-window-x"></i><RouterLink to="/contratoMandato">Contrato Mandato</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-usb-symbol"></i><RouterLink to="/contratoLicencia">Contrato de licencia</RouterLink></a></li>
-      <span class="nav-heading text-black" style="font-size: 15px">Proceso Recaudacion</span>
+      <span class="nav-heading text-black" style="font-size: 15px">Recaudacion</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-thunderbolt-fill"></i><RouterLink to="/recaudacion">Recaudacion</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-terminal-x"></i><RouterLink to="/reporteCobro">Reporte de cobro</RouterLink></a></li>
-      <span class="nav-heading text-black" style="font-size: 15px">Proceso Juridico</span>
+      <span class="nav-heading text-black" style="font-size: 15px">Juridico</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-send-exclamation-1"></i><RouterLink to="/reclamaciones">Reclamaciones</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-motherboard-fill"></i><RouterLink to="/contratos">Contratos</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-app-indicator"></i><RouterLink to="/controlServiciosJuridicos">Control servicios juridicos</RouterLink></a></li>

@@ -23,7 +23,9 @@ const indice = indiceActualizado                //VARIABLE QUE CONTROLA EL COMPO
 const utilizadorAPI = ref([])
 const representanteAPI = ref([])
 const proformaAPI = ref([])
-const contratoLicEstatalAPI = ref([])
+const contratoEstatalAPI = ref([])
+const contratoNoEstatalJuridicoAPI = ref([])
+const contratoNoEstatalNaturalAPI = ref([])
 const municipioAPI = ref([])
 const modalidadAPI = ref([])
 const objProforma = ref({
@@ -84,7 +86,7 @@ const dataPost = ref({
   ci: '',
   ejecucionObrasComercial: '',
   email: '',
-  telefono: '',
+  telefono: null,
 })
 const lastContrato = ref({
   pk:'',
@@ -341,7 +343,7 @@ const getMunicipios = (event) => {
 //FUNCION PARA RENDERIZAR EL FORMULARIO DE ANEXO SEGUN EL ANEXO SELECCIONADO
 const agingarValorIndicadorAnexo = (event) => indicadorAnexo.value = event.target.value
 
-// FUNCION PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
+// FUNCIONES PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
 const actualizarAnexos71Musica = () => GET('licenciamiento/anexo71Musica/', anexo71MusicaAPI)
 const actualizarAnexos71Audiovisual = () => GET('licenciamiento/anexo71Audiovisual/', anexo71AudiovisualAPI)
 const actualizarAnexos72Cimex = () => GET('licenciamiento/anexo72Cimex/', anexo72CimexAPI)
@@ -399,10 +401,17 @@ const editarAnexo = async (url, index) => {
       })
 }
 
+// FUNCION PARA ACTUALIZAR LOS LISTADOS DE LOS CONTRATOS
+const actualizarContratosEstatales = () => GET("licenciamiento/contratoLicenciaEstatal/", contratoEstatalAPI)
+const actualizarContratosNoEstatalesJuridicos = () => GET("licenciamiento/contratoLicenciaPersonaJuridica/", contratoNoEstatalJuridicoAPI)
+const actualizarContratosNoEstatalesNaturales = () => GET("licenciamiento/contratoLicenciaPersonaNatural/", contratoNoEstatalNaturalAPI)
+
 onMounted(() => {
   GET("licenciamiento/utilizador/", utilizadorAPI)
   GET("licenciamiento/representante/", representanteAPI)
-  GET("licenciamiento/contratoLicenciaEstatal/", contratoLicEstatalAPI)
+  GET("licenciamiento/contratoLicenciaEstatal/", contratoEstatalAPI)
+  GET("licenciamiento/contratoLicenciaPersonaJuridica/", contratoNoEstatalJuridicoAPI)
+  GET("licenciamiento/contratoLicenciaPersonaNatural/", contratoNoEstatalNaturalAPI)
   GET("licenciamiento/modalidad/", modalidadAPI)
 })
 </script>
@@ -420,21 +429,6 @@ onMounted(() => {
     </div>
     <section class="section dashboard">
       <div class="row">
-        <div class="col-lg-12">
-          <div class="alert alert-light glassmorphism text-center alert-dismissible fade show" role="alert">
-            <i class="bi bi-star me-1"></i> <strong>GENERAR UN NUEVO CONTRATO</strong>
-            <div class="filter">
-              <a class="icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-three-dots" style="color: black"></i></a>
-              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
-                <li class="dropdown-header text-start">
-                  <h6>Acciones</h6>
-                </li>
-                <li><a class="dropdown-item" href="#"><i class="bi bi-arrow-repeat"></i>Actualizar listado</a></li>
-              </ul>
-            </div>
-          </div>
-
-        </div>
         <!--        COMPONENTE WIZARD-->
         <div class="col-lg-12">
           <Wizard
@@ -2383,15 +2377,157 @@ onMounted(() => {
           </Wizard>
         </div>
         <hr>
+
         <!--        Listado de contratos-->
-        <div class="col-lg-2" v-for="item in contratoLicEstatalAPI" :key="item.id" :value="item.id">
-          <div class="card glassmorphism">
-            <img src="../assets/img/img-contrato3.jpg" class="card-img-top" alt="...">
-            <div class="card-body">
-              <br>
-              <span class="badge rounded-pill bg-light text-dark">Contrato:{{ item.fk_utilizador }}</span>
+<!--        ESTATALES-->
+        <div class="col-lg-12">
+          <div class="alert alert-light glassmorphism text-center text-dark alert-dismissible fade show" role="alert">
+            <i class="bi bi-layout-text-window-reverse"></i> <strong> Contratos Estatales</strong>
+            <div class="filter">
+              <a class="icon" href="#" title="Actualizar"><i class="bi bi-arrow-repeat"
+                                          @click="actualizarContratosEstatales"
+                                          style="color: black"></i></a>
             </div>
           </div>
+        </div>
+        <div class="col-lg-1" v-for="item in contratoEstatalAPI" :key="item.id" :value="item.id" style="margin-bottom: 15px">
+          <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
+          <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#id'+item.id" title="Detalles"><i
+              class="bi bi-file-earmark-pdf"></i></span>
+<!--          MODAL-->
+          <div class="modal fade" :id="'id'+item.id" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"><i class="bi bi-file-earmark-pdf"></i> <strong> Contrato con:</strong>
+                    {{ item.utilizador }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Numero de licencia
+                      <span class="badge bg-primary rounded-pill">{{ item.numeroLicencia }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Fecha de creacion
+                      <span class="badge bg-primary rounded-pill">{{ item.fechaCreacionContrato }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Subordinacion
+                      <span class="badge bg-primary rounded-pill">{{ item.subordinacion }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Nombre del Firmante
+                      <span class="badge bg-primary rounded-pill">{{ item.nombreFirmanteContrato }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Cargo del Firmante
+                      <span class="badge bg-primary rounded-pill">{{ item.cargoFirmanteContrato }}</span></li>
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+              </div>
+            </div>
+          </div>
+          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
+              class="bi bi-pencil"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaEstatal/'+item.id)"></i></span>
+        </div>
+
+<!--        NO ESTATLES JURIDICOS-->
+        <div class="col-lg-12">
+          <div class="alert alert-light glassmorphism text-center text-dark alert-dismissible fade show" role="alert">
+            <i class="bi bi-layout-text-window-reverse"></i> <strong> Contratos No Estatales Juridico</strong>
+            <div class="filter">
+              <a class="icon" href="#" title="Actualizar"><i class="bi bi-arrow-repeat"
+                                          @click="actualizarContratosNoEstatalesJuridicos"
+                                          style="color: black"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1" v-for="item in contratoNoEstatalJuridicoAPI" :key="item.id" :value="item.id" style="margin-bottom: 15px">
+          <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
+          <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#idJuridico'+item.id" title="Detalles"><i
+              class="bi bi-file-earmark-pdf"></i></span>
+          <!--          MODAL-->
+          <div class="modal fade" :id="'idJuridico'+item.id" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"><i class="bi bi-file-earmark-pdf"></i> <strong> Contrato con:</strong>
+                    {{ item.utilizador }}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Numero de licencia
+                      <span class="badge bg-primary rounded-pill">{{ item.numeroLicencia }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Codigo asignado
+                      <span class="badge bg-primary rounded-pill">{{ item.codigo }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Fecha de creacion
+                      <span class="badge bg-primary rounded-pill">{{ item.fechaCreacionContrato }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Tipo
+                      <span class="badge bg-primary rounded-pill">{{ item.tipo }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Tarifa
+                      <span class="badge bg-primary rounded-pill">{{ item.tarifa }}%</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Nombre del Firmante
+                      <span class="badge bg-primary rounded-pill">{{ item.nombreFirmanteContrato }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Cargo del Firmante
+                      <span class="badge bg-primary rounded-pill">{{ item.cargoFirmanteContrato }}</span></li>
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+              </div>
+            </div>
+          </div>
+          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
+              class="bi bi-pencil"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaPersonaJuridica/'+item.id)"></i></span>
+        </div>
+
+<!--        NO ESTATALES NATURALES-->
+        <div class="col-lg-12">
+          <div class="alert alert-light glassmorphism text-center text-dark alert-dismissible fade show" role="alert">
+            <i class="bi bi-layout-text-window-reverse"></i> <strong> Contratos No Estatales Natural</strong>
+            <div class="filter">
+              <a class="icon" href="#" title="Actualizar"><i class="bi bi-arrow-repeat"
+                                          @click="actualizarContratosNoEstatalesNaturales"
+                                          style="color: black"></i></a>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-1" v-for="item in contratoNoEstatalNaturalAPI" :key="item.id" :value="item.id" style="margin-bottom: 15px">
+          <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
+          <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#idNatural'+item.id" title="Detalles"><i
+              class="bi bi-file-earmark-pdf"></i></span>
+          <!--          MODAL-->
+          <div class="modal fade" :id="'idNatural'+item.id" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"><i class="bi bi-file-earmark-pdf"></i> <strong> Contrato con:</strong>
+                    {{ item.utilizador }}{{item.id}}</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                  <ul class="list-group">
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Numero de licencia
+                      <span class="badge bg-primary rounded-pill">{{ item.numeroLicencia }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Fecha de creacion
+                      <span class="badge bg-primary rounded-pill">{{ item.fechaCreacionContrato }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Modalidad
+                      <span class="badge bg-primary rounded-pill">{{ item.actividadComercial }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Codigo
+                      <span class="badge bg-primary rounded-pill">{{ item.codigo }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Tarifa
+                      <span class="badge bg-primary rounded-pill">{{ item.tarifa }}%</span></li>
+                  </ul>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button></div>
+              </div>
+            </div>
+          </div>
+          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
+              class="bi bi-pencil"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaPersonaNatural/'+item.id)"></i></span>
         </div>
       </div>
     </section>
