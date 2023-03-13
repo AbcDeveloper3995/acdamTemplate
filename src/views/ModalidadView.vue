@@ -117,7 +117,7 @@ onMounted(() => {
                 <div class="col-md-12">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Nombre</label></div>
                 </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/modalidad/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">

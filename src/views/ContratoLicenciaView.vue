@@ -477,15 +477,17 @@ onMounted(() => {
                   </select>
                   <label for="floatingSelect">Utilizadores</label>
                 </div>
-                <div v-if="objUtilizador.tipo=='Estatal'" class="alert alert-secondary alert-dismissible fade show" role="alert">
-                  <h5><strong>Datos del utilizador:</strong></h5>
+                <div v-if="objUtilizador.tipo=='Estatal'" class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert">
+                  <h5><i class="bi bi-person-bounding-box"></i><strong> Datos del utilizador:</strong></h5>
+                  <hr>
                   <p>Tipo: Estatal</p>
                   <p>Sector: {{ objUtilizador.sector }}</p>
                   <p>Derecho: {{ objUtilizador.derecho }}</p>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
-                <div v-if="objUtilizador.tipo=='No estatal'" class="alert alert-secondary alert-dismissible fade show" role="alert">
-                  <h5><strong>Datos del utilizador:</strong></h5>
+                <div v-if="objUtilizador.tipo=='No estatal'" class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert">
+                  <h5><i class="bi bi-person-bounding-box"></i><strong> Datos del utilizador:</strong></h5>
+                  <hr>
                   <p>Tipo: No estatal ({{ objUtilizador.tipoNoEstatal }}) </p>
                   <p>Sector: {{ objUtilizador.sector }}</p>
                   <p>Derecho: {{ objUtilizador.derecho }}</p>
@@ -508,7 +510,7 @@ onMounted(() => {
             <!--            FORMULARIO PARA SI ES ESTATAL-->
             <p class="text-center"><span v-if="currentTabIndex === 1 && objProforma.tipoProforma == 1"
                   class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
-              Ingrese la informacion solicitada para el modelo de contrato estatal</span></p>
+              Contrato estatal</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 1">
               <form class="row">
                 <div class="col-md-4">
@@ -520,15 +522,6 @@ onMounted(() => {
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Codigo</label></div>
-                </div>
-                <div class="col-md-4">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Asociados</label>
-                  </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.resolucionUtilizador"
@@ -667,27 +660,26 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
+                </div>
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaEstatal/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
             </div>
+
             <!--            FORMULARIO SI ES NO ESTATAL JURIDICO-->
             <p class="text-center"><span v-if="currentTabIndex === 1 && objProforma.tipoProforma == 2"
                   class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
-              Ingrese la informacion solicitada para el modelo de contrato no estatal juridico</span></p>
+              Contrato no estatal juridico</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 2">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Asociados</label>
-                  </div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.numeroLicencia"
                                                     id="floatingName"
@@ -849,7 +841,7 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Correo</label></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.actividadComercial">
                       <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
@@ -858,7 +850,7 @@ onMounted(() => {
                     <label for="floatingSelect">Actividad Comercial</label>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.ejecucionObrasComercial">
                       <option v-for="item in CHOICES[11].TIPO_OBRA_COMERCIAL" :key="item.value" :value="item.value">{{ item.descripcion }}
@@ -866,6 +858,14 @@ onMounted(() => {
                     </select>
                     <label for="floatingSelect">Ejecucion de obras musicales</label>
                   </div>
+                </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
+                  <br>
                 </div>
                 <hr>
                 <div class="col-md-9">
@@ -897,27 +897,20 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
+
                 <div class="text-center">
                   <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaJuridica/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
             </div>
+
             <!--            FORMULARIO SI ES NO ESTATAL NATURAL (CONTRATO EJECUCION PUBLICA)-->
             <p class="text-center"><span v-if="currentTabIndex === 1 && objProforma.tipoProforma == 3"
                                          class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
-              Ingrese la informacion solicitada para el modelo de contrato no estatal natural (Contrato Ejecucion Publica)</span></p>
+              Contrato no estatal natural (Contrato Ejecucion Publica)</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 3">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Asociados</label>
-                  </div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.numeroLicencia"
                                                     id="floatingName"
@@ -1067,6 +1060,14 @@ onMounted(() => {
                     <label for="floatingSelect">Ejecucion de obras musicales</label>
                   </div>
                 </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
+                  <br>
+                </div>
                 <hr>
                 <div class="col-md-9">
                   <div class="col-sm-10">
@@ -1103,21 +1104,13 @@ onMounted(() => {
                 </div>
               </form>
             </div>
+
             <!--            FORMULARIO SI ES NO ESTATAL NATURAL (CONTRATO COMPRADOR VENDEDOR)-->
             <p class="text-center"><span v-if="currentTabIndex === 1 && objProforma.tipoProforma == 4"
                                          class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
-              Ingrese la informacion solicitada para el modelo de contrato no estatal natural (Contrato Comprador-Vendedor)</span></p>
+              Contrato no estatal natural (Contrato Comprador-Vendedor)</span></p>
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 4">
               <form class="row">
-                <div class="col-md-4">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Asociados</label>
-                  </div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.numeroLicencia"
                                                     id="floatingName"
@@ -1224,7 +1217,7 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Direccion Comercial</label></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="getMunicipios" v-model="dataPost.provinciaComercial">
                       <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
@@ -1233,7 +1226,7 @@ onMounted(() => {
                     <label for="floatingSelect">Provincia Comercial</label>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_municipioComercial">
                       <option v-for="item in municipioAPI" :key="item.id" :value="item.id">{{ item.nombre }}
@@ -1242,15 +1235,23 @@ onMounted(() => {
                     <label for="floatingSelect">Municipio Comercial</label>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.telefono"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Telefono</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Telefono</label><br></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating"><input type="email" class="styleInput form-control" v-model="dataPost.email"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Correo</label></div>
+                </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
+                  <br>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
@@ -2373,7 +2374,6 @@ onMounted(() => {
                   <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
               </div>
             </div>
-
           </Wizard>
         </div>
         <hr>

@@ -60,8 +60,8 @@ const editarUtilizador = async (item, index) => {
       .then((response) => {
         dataPost.value.pk = response.data.data.id
         dataPost.value.nombre = response.data.data.nombre
-        dataPost.value.fk_sector = response.data.data.fk_sector
-        dataPost.value.tipo = response.data.data.tipo
+        dataPost.value.fk_sector = response.data.idSector
+        dataPost.value.tipo = response.data.tipo
         dataPost.value.tipoNoEstatal = response.data.data.tipoNoEstatal
         dataPost.value.tipoDerecho = response.data.data.tipoDerecho
       })
@@ -128,7 +128,7 @@ onMounted(() => {
                 <div class="col-md-12">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Nombre</label></div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
@@ -136,7 +136,7 @@ onMounted(() => {
                       <option v-for="item in sectorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Sector</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Sector</label>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -145,7 +145,7 @@ onMounted(() => {
                       <option v-for="item in CHOICES[0].UTILIZADOR" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Tipo</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Tipo</label>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -163,7 +163,7 @@ onMounted(() => {
                       <option v-for="item in CHOICES[2].DERECHOS" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Derecho</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Derecho</label>
                   </div>
                 </div>
                 <div class="text-center">

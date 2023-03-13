@@ -15,6 +15,8 @@ const {mensaje} = notificaciones()
 
 const contratoMandatoAPI = ref([])
 
+const actualizarContratosMandatos = () => GET("licenciamiento/contratoMandato/", contratoMandatoAPI)
+
 onMounted(() => {
   GET("licenciamiento/contratoMandato/", contratoMandatoAPI)
 })
@@ -36,6 +38,11 @@ onMounted(() => {
         <div class="col-lg-12">
           <div class="alert alert-light glassmorphism text-center text-dark alert-dismissible fade show" role="alert">
             <i class="bi bi-layout-text-window-reverse"></i> <strong> Contratos Mandatos</strong>
+            <div class="filter">
+              <a class="icon" href="#" title="Actualizar"><i class="bi bi-arrow-repeat"
+                                                             @click="actualizarContratosMandatos"
+                                                             style="color: black"></i></a>
+            </div>
           </div>
         </div>
         <!--        Listado de contratos-->

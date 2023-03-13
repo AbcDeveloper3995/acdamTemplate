@@ -242,17 +242,17 @@ onMounted(() => {
                 <div class="col-md-12">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Nombre</label></div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.apellidos"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Apellidos</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Apellidos</label></div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.ci"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Carnet Identidad</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Carnet Identidad</label></div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
@@ -260,7 +260,7 @@ onMounted(() => {
                       <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Provincia</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Provincia</label>
                   </div>
                 </div>
                 <div class="col-md-6">
@@ -269,35 +269,29 @@ onMounted(() => {
                       <option v-for="item in municipioAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Municipio</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Municipio</label>
                   </div>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_municipiosAtendidos" multiple>
-                      <option v-for="item in municipioAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Municipios que atiende</label>
-                  </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Municipios que atiende</label>
+                  <select class="styleInput form-select" id="inputState" aria-label="Cargo" v-model="dataPost.fk_municipiosAtendidos" multiple>
+                    <option v-for="item in municipioAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_utilizador" multiple>
-                      <option v-for="item in utilizadorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Utilizador</label>
-                  </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Utilizador</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_utilizador" multiple>
+                    <option v-for="item in utilizadorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
                 </div>
-                <div class="col-md-6">
-                  <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector" multiple>
-                      <option v-for="item in sectorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                    <label for="floatingSelect">Sector</label>
-                  </div>
+                <div class="col-md-4">
+                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Sector</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector" multiple>
+                    <option v-for="item in sectorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
@@ -308,26 +302,26 @@ onMounted(() => {
                     <label for="floatingSelect">Atendido por</label>
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-6">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.direccion"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Direccion</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Direccion</label></div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.nivelEscolaridad">
                       <option v-for="item in CHOICES[4].NIVEL_ESCOLARIDAD" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Escolaridad</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Escolaridad</label>
                   </div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Codigo</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo</label></div>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="email" class="styleInput form-control" v-model="dataPost.email"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Correo</label></div>
@@ -456,7 +450,7 @@ onMounted(() => {
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.numeroContrato"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Numero de Contrato</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Numero de Contrato</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating mb-3">
@@ -464,39 +458,37 @@ onMounted(() => {
                         <option v-for="item in CHOICES[6].ACTIVIDAD" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Tipo Actividad</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Tipo Actividad</label>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.numeroLicencia"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">No. Licencia</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>No. Licencia</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaLicencia"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Fecha Licencia</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Licencia</label><br></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaInscripcion"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Fecha Inscripcion</label></div>
-                  </div>
-
-                  <div class="col-md-4">
-                    <div class="form-floating mb-3">
-                      <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="contratoMandatoPost.fk_representantesAsociados" multiple>
-                        <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                        </option>
-                      </select>
-                      <label for="floatingSelect">Asociados</label>
-                    </div>
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Inscripcion</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.remuneracion"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Remuneracion (%)</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Remuneracion (%)</label></div>
                   </div>
+                  <div class="col-md-4">
+                    <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                      </option>
+                    </select>
+                  </div>
+
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
                                                       id="floatingName" v-model="contratoMandatoPost.fk_representante"
