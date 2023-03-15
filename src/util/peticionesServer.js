@@ -29,6 +29,7 @@ const POST_PUT = async (url, dataPost, indice) => {
     } catch (error) {
         console.log("error: ", error)
         if (error.response.status == 400) {
+            console.log(error.response.data)
             let dataError = error.response.data
             let claves = Object.keys(dataError)
             claves.forEach(item => {

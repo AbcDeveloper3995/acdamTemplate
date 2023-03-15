@@ -92,6 +92,12 @@ const isActive = (pagina) => {
   return pagina == paginaActual ? 'active' : ''
 }
 
+// FUNCION PARA HABILITAR EL CAMPO TIPO NO ESTATAL EN CASO DE SER SELECCIONADO EL VALOR NO ESTATAL EN EL CAMPO TIPO
+const habilitarTipoNoEstatal = (event) => {
+  let tipoNoEstatal = document.getElementById('tipoNoEstatal')
+  event.target.value=='2'?tipoNoEstatal.disabled=false:tipoNoEstatal.disabled=true
+}
+
 onMounted(() => {
   getUtilizadorPaginados()
   GET("licenciamiento/sector/", sectorAPI)
@@ -126,13 +132,14 @@ onMounted(() => {
                  data-bs-parent="#cardFormulario">
               <form class="row g-3">
                 <div class="col-md-12">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
+                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre" required
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Nombre</label></div>
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector">
+                      <option  value="">----------</option>
                       <option v-for="item in sectorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
@@ -141,7 +148,8 @@ onMounted(() => {
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.tipo">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="habilitarTipoNoEstatal" v-model="dataPost.tipo">
+                      <option  value="">----------</option>
                       <option v-for="item in CHOICES[0].UTILIZADOR" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
@@ -150,7 +158,8 @@ onMounted(() => {
                 </div>
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.tipoNoEstatal">
+                    <select class="styleInput form-select" id="tipoNoEstatal" aria-label="Cargo" v-model="dataPost.tipoNoEstatal" disabled>
+                      <option  value="">----------</option>
                       <option v-for="item in CHOICES[3].UTILIZADOR_NO_ESTATAL" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
@@ -160,6 +169,7 @@ onMounted(() => {
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.tipoDerecho">
+                      <option  value="">----------</option>
                       <option v-for="item in CHOICES[2].DERECHOS" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>

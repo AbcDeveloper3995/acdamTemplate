@@ -31,16 +31,16 @@ const dataPost = ref({
   pk: '',
   nombre: '',
   apellidos: '',
-  ci: '',
+  ci: null,
   provincia: '',
-  fk_municipiosAtendidos: '',
+  fk_municipiosAtendidos: [],
   fk_municipioResidente: '',
-  fk_utilizador: '',
-  fk_sector: '',
+  fk_utilizador: [],
+  fk_sector: [],
   fk_usuario: '',
   direccion: '',
   nivelEscolaridad: '',
-  codigo: '',
+  codigo: null,
   email: '',
 })
 const indiceContrato = ref(false)
@@ -54,9 +54,9 @@ const contratoMandatoPost = ref({
   fechaLicencia:'',
   fechaInscripcion:'',
   tipoActividad:'',
-  numeroLicencia:'',
-  numeroContrato:'',
-  remuneracion:'',
+  numeroLicencia:null,
+  numeroContrato:null,
+  remuneracion:null,
 })
 const lastContrato = ref({
   pk:'',
@@ -64,6 +64,7 @@ const lastContrato = ref({
   numeroContrato:'',
 })
 const contratoFormato = ref('')
+const indiceNextButton = ref(true)
 
 let loading = ref(false)
 let buscar = ref("");
@@ -203,6 +204,9 @@ const getMunicipios = (event) => {
       })
 }
 
+// FUNCION PARA HABILITAR EL BOTON SIGUIENTE EN EL WIZARD UNA VEZ SALVADO EL FORMULARIO DEL CONTRATO
+const habilitarNextButton = () => indiceNextButton.value = false
+
 onMounted(() => {
   getRepresentantesPaginados()
   GET("licenciamiento/utilizador/", utilizadorAPI)
@@ -317,7 +321,7 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo"
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo" required
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo</label></div>
                 </div>
@@ -389,7 +393,7 @@ onMounted(() => {
                             class="bi bi-pencil"></i></span>
                       <span class="sombra badge bg-danger m-lg-1" @click="DELETE('licenciamiento/representante/'+item.id)"
                             title="Eliminar"><i class="bi bi-trash"></i></span>
-                      <span class="sombra badge bg-secondary"  @click="mostrarOocultarContratoSegunValorIndice(item.id)" title="Generar contrato"><i
+                      <span v-if="!item.tieneContrato" class="sombra badge bg-secondary"  @click="mostrarOocultarContratoSegunValorIndice(item.id)" title="Generar contrato"><i
                           class="bi bi-file-earmark-pdf"></i></span>
                     </td>
                     <td>{{ item.nombre }}</td>
@@ -423,12 +427,13 @@ onMounted(() => {
                                 icon: 'arrow-right',
                                 hideText: false,
                                 hideIcon: false,
-                                disabled: false}"
+                                disabled: indiceNextButton}"
               :backButton="{text: 'Anterior',
                                 icon: 'arrow-left',
                                 hideText: false,
                                 hideIcon: false,
                                 disabled: false}"
+              :doneButton="{text:'Finalizar'}"
               :custom-tabs="[
                                   {
                                     title: 'Datos del contrato',
@@ -445,7 +450,7 @@ onMounted(() => {
             <div class="row" v-if="currentTabIndex === 0">
               <div>
                 <p class="text-center"><span class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
-              Ingrese la informacion solicitada para el modelo de contrato mandato</span></p>
+              Modelo de contrato mandato</span></p>
                 <form class="row">
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.numeroContrato"
@@ -505,7 +510,7 @@ onMounted(() => {
                                                       placeholder="Nombre"></div>
                   </div>
                   <div class="text-center">
-                    <button @click="POST_PUT('licenciamiento/contratoMandato/', contratoMandatoPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <button @click="POST_PUT('licenciamiento/contratoMandato/', contratoMandatoPost, -1); habilitarNextButton()"  class="miBtn btn btn-outline-light" type="button">
                       <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                   </div>
                 </form>

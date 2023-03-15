@@ -115,7 +115,7 @@ onMounted(() => {
                  data-bs-parent="#cardFormulario">
               <form class="row g-3">
                 <div class="col-md-12">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
+                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre" required
                                                     id="floatingName"
                                                     placeholder="Nombre"><label for="floatingName"><span class="text-danger">* </span>Nombre</label></div>
                 </div>
