@@ -54,18 +54,19 @@ const dataPost = ref({
   resolucionFirmante: '',
   fechaResolucionFirmante: '',
   provincia: '',
-  numeroLicencia: '',
-  nit: '',
-  codigo: '',
+  numeroLicencia: null,
+  nit: null,
+  codigo: null,
   direccion: '',
   estado: '',
   tiempoVigencia: '',
-  fechaVecimiento: '',
+  fechaVencimiento: null,
   subordinacion: '',
   nombreFirmanteContrato: '',
   cargoFirmanteContrato: '',
   codigoREEUP: '',
-  cuentaBancaria: '',
+  cuentaBancaria: null,
+  titular:'',
   emitido: '',
   sucursal: '',
   tarifa: 0,
@@ -127,12 +128,14 @@ const anexo72CimexAPI = ref([])
 const anexo72GaviotaAPI = ref([])
 const anexo72TrdAPI = ref([])
 const nombreUtilizador = ref()
+const indiceNextButton = ref(true)
 
 let currentTabIndex = 0                        //variable que funciona como indice del wizard
 
 //PARA EL WIZARD
 const onChangeCurrentTab = (index, oldIndex) => {
   currentTabIndex = index;
+  currentTabIndex==1?indiceNextButton.value=true:''
   //OBTENCION DEL UTLTIMO CONTRATO CREADO PARA PODER RENDERIZARLO Y EXPORTARLO A PDF (PASO 3)
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 1){
     let url = `licenciamiento/contratoLicenciaEstatal/${dataPost.value.fk_usuario}/getlastContrato/`
@@ -149,10 +152,12 @@ const onChangeCurrentTab = (index, oldIndex) => {
           lastContrato.value.codigo = response.data.codigo
         })
         .catch((error) => {
+          currentTabIndex==2?indiceNextButton.value=true:''
           mensaje('error','Error', error.response.data.error)
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 2) {
+    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaJuridica/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -197,6 +202,7 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 3) {
+    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -241,6 +247,7 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 4) {
+    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -278,6 +285,7 @@ Telefono: _____________________ Email: ___________________</h3>
   // Asignar el id del ultimo contrato a su respectivo campo en el formulario del anexo, independientemente de
   // cual anexo sea
   if (currentTabIndex === 3 && objProforma.value.tipoProforma == 1){
+    currentTabIndex==1?indiceNextButton.value=true:''
     dataAnexoPost.value.fk_contratoLicenciaEstatal = lastContrato.value.pk
   }
 }
@@ -406,6 +414,9 @@ const actualizarContratosEstatales = () => GET("licenciamiento/contratoLicenciaE
 const actualizarContratosNoEstatalesJuridicos = () => GET("licenciamiento/contratoLicenciaPersonaJuridica/", contratoNoEstatalJuridicoAPI)
 const actualizarContratosNoEstatalesNaturales = () => GET("licenciamiento/contratoLicenciaPersonaNatural/", contratoNoEstatalNaturalAPI)
 
+// FUNCION PARA HABILITAR EL BOTON SIGUIENTE EN EL WIZARD UNA VEZ SALVADO EL FORMULARIO DEL CONTRATO
+const habilitarNextButton = () => indiceNextButton.value = false
+
 onMounted(() => {
   GET("licenciamiento/utilizador/", utilizadorAPI)
   GET("licenciamiento/representante/", representanteAPI)
@@ -439,12 +450,13 @@ onMounted(() => {
                                 icon: 'arrow-right',
                                 hideText: false,
                                 hideIcon: false,
-                                disabled: false}"
+                                disabled: indiceNextButton}"
               :backButton="{text: 'Anterior',
                                 icon: 'arrow-left',
                                 hideText: false,
                                 hideIcon: false,
                                 disabled: false}"
+              :doneButton="{text:'Finalizar'}"
               :custom-tabs="[
                                   {
                                     title: 'Seleccion de utilizador y proforma',
@@ -475,7 +487,7 @@ onMounted(() => {
                     <option v-for="item in utilizadorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                     </option>
                   </select>
-                  <label for="floatingSelect">Utilizadores</label>
+                  <label for="floatingSelect"><span class="text-danger">* </span>Utilizadores</label>
                 </div>
                 <div v-if="objUtilizador.tipo=='Estatal'" class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert">
                   <h5><i class="bi bi-person-bounding-box"></i><strong> Datos del utilizador:</strong></h5>
@@ -496,12 +508,12 @@ onMounted(() => {
               </div>
               <div class="col-md-6">
                 <div class="form-floating mb-3">
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="getProforma($event)">
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="getProforma($event); habilitarNextButton() ">
                     <option  value="">----------</option>
                     <option v-for="item in proformaAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                     </option>
                   </select>
-                  <label for="floatingSelect">Proformas</label>
+                  <label for="floatingSelect"><span class="text-danger">* </span>Proformas</label>
                 </div>
               </div>
             </div>
@@ -516,37 +528,37 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.numeroLicencia"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Numero de Licencia</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Numero de Licencia</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Codigo</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.resolucionUtilizador"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Resolucion utilizador</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Resolucion utilizador</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="date" class="styleInput form-control" v-model="dataPost.fechaResolucionUtilizador"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Fecha de la resolucion</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha de la resolucion</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.emisionResolucionUtilizador"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Resolucion emitida por</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Resolucion emitida por</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.subordinacion"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Subordinacion</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Subordinacion</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.direccion"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Direcion</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Direcion</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
@@ -554,7 +566,7 @@ onMounted(() => {
                       <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Provincia</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Provincia</label>
                   </div>
                 </div>
                 <div class="col-md-4">
@@ -563,38 +575,38 @@ onMounted(() => {
                       <option v-for="item in municipioAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Municipio</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Municipio</label>
                   </div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.codigoREEUP"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Codigo REEUP</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo REEUP</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.nit"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">NIT</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>NIT</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaBancaria"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Cuenta Bancaria</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Cuenta Bancaria</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.titular"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Titular de cuenta</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Titular de cuenta</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.banco"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Banco</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Banco</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.sucursal"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Sucursal</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Sucursal</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.direccionBanco"
@@ -604,46 +616,53 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombreFirmanteContrato"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Nombre del Firmante</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Nombre y Apellidos del Firmante</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.cargoFirmanteContrato"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Cargo del firmante</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Cargo del firmante</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.resolucionFirmante"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Resolucion firmante</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Resolucion firmante</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="date" class="styleInput form-control" v-model="dataPost.fechaResolucionFirmante"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Fecha de la resolucion</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha de la resolucion</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.emitido"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Emitido por</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Emitido por</label></div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.estado">
                       <option v-for="item in CHOICES[5].ESTADO" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Estado</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Estado</label>
                   </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-6">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.tiempoVigencia"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Tiempo Vigencia</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Tiempo Vigencia</label></div>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="date" class="styleInput form-control" v-model="dataPost.fechaVecimiento"
+                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
+                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVencimiento"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">Fecha Expiracion</label></div>
+                                                    placeholder="Nombre"></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
@@ -660,15 +679,8 @@ onMounted(() => {
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
-                <div class="col-md-4">
-                  <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                    <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                    </option>
-                  </select>
-                </div>
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/contratoLicenciaEstatal/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('licenciamiento/contratoLicenciaEstatal/', dataPost, -1); habilitarNextButton()"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
@@ -899,7 +911,7 @@ onMounted(() => {
                 </div>
 
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaJuridica/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaJuridica/', dataPost, -1); habilitarNextButton()"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
@@ -1099,7 +1111,7 @@ onMounted(() => {
                                                     placeholder="Nombre"></div>
                 </div>
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1); habilitarNextButton()"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
@@ -1269,7 +1281,7 @@ onMounted(() => {
                                                     placeholder="Nombre"></div>
                 </div>
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('licenciamiento/contratoLicenciaPersonaNatural/', dataPost, -1); habilitarNextButton()"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> Salvar</button>
                 </div>
               </form>
