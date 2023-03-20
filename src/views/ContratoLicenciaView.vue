@@ -13,7 +13,7 @@ import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import CHOICES from '../util/choicesDeLicenciamiento'
-import {GET, POST_PUT, DELETE, indiceActualizado} from '../util/peticionesServer'
+import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
 import {dia, mes, ano, PDF} from '../util/functiosGlobal'
 
 //DECLARACIONES
@@ -60,7 +60,7 @@ const dataPost = ref({
   direccion: '',
   estado: '',
   tiempoVigencia: null,
-  fechaVencimiento: null,
+  fechaVecimiento: null,
   subordinacion: '',
   nombreFirmanteContrato: '',
   cargoFirmanteContrato: '',
@@ -417,6 +417,42 @@ const actualizarContratosNoEstatalesNaturales = () => GET("licenciamiento/contra
 // FUNCION PARA HABILITAR EL BOTON SIGUIENTE EN EL WIZARD UNA VEZ SALVADO EL FORMULARIO DEL CONTRATO
 const habilitarNextButton = () => indiceNextButton.value = false
 
+// FUNCION PARA CALCULAR EL IMPORTE DE MANERA AUTOMATICA SEGUN LA CANTIDAD DE PLAZAS (ANEXO 72 CIMEX)
+const calcularImporte = (event) => {
+  let cantPlazas = document.getElementById('idCantPlazas')
+  try {
+    dataAnexoPost.value.importe = event.target.value*cantPlazas.value
+  }catch (error) {
+    mensaje('error','Error', "Ha ocurrido un error.")
+}
+}
+
+// FUNCIONES PARA CALCULAR EL IMPORTE DE MANERA AUTOMATICA SEGUN EL NUMERO DE HABITACIONES (ANEXO 72 GAVIOTA)
+const calcularImporteTempAlta = (event) => {
+  let numeroHabitaciones = document.getElementById('numeroHabitaciones')
+  try {
+    dataAnexoPost.value.importeTemporadaAlta = event.target.value*numeroHabitaciones.value
+  }catch (error) {
+    mensaje('error','Error', "Ha ocurrido un error.")
+  }
+}
+const calcularImporteTempBaja = (event) => {
+  let numeroHabitaciones = document.getElementById('numeroHabitaciones')
+  try {
+    dataAnexoPost.value.importeTemporadaBaja = event.target.value*numeroHabitaciones.value
+  }catch (error) {
+    mensaje('error','Error', "Ha ocurrido un error.")
+  }
+}
+const calcularImporteInferior = (event) => {
+  let numeroHabitaciones = document.getElementById('numeroHabitaciones')
+  try {
+    dataAnexoPost.value.importeTemporadaOcupacionInferior = event.target.value*numeroHabitaciones.value
+  }catch (error) {
+    mensaje('error','Error', "Ha ocurrido un error.")
+  }
+}
+
 onMounted(() => {
   GET("licenciamiento/utilizador/", utilizadorAPI)
   GET("licenciamiento/representante/", representanteAPI)
@@ -660,7 +696,7 @@ onMounted(() => {
                   </select>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVencimiento"
+                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVecimiento"
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
@@ -906,7 +942,7 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVencimiento"
+                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVecimiento"
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
@@ -1119,7 +1155,7 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVencimiento"
+                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVecimiento"
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
@@ -1300,7 +1336,7 @@ onMounted(() => {
                   <br>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVencimiento"
+                  <div class="form-floating"><input type="date" hidden class="styleInput form-control" v-model="dataPost.fechaVecimiento"
                                                     id="floatingName"
                                                     placeholder="Nombre"></div>
                 </div>
@@ -1509,58 +1545,66 @@ onMounted(() => {
                   <div class="col-md-6">
                     <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"  class="styleInput form-control" v-model="dataAnexoPost.locacion"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Locacion</label></div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.modalidad">
+                        <option  value="">----------</option>
                         <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Modalidad</label>
+                      <label for="floatingSelect">
+                        <span class="text-danger">* </span>Modalidad</label>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.tipoMusica">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[11].TIPO_OBRA_COMERCIAL" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Tipo de Musica</label>
+                      <label for="floatingSelect">
+                        <span class="text-danger">* </span>Tipo de Musica</label>
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa</label></div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de pago</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
                     </div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de entrega</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control"  hidden readonly id="contratoAnexo71Musica"
                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
-                                                      placeholder="Nombre"> <label for="floatingName">Estatal</label></div>
+                                                      placeholder="Nombre"></div>
                   </div>
                   <div v-if="objProforma.tipoProforma!=1" class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" readonly
                                                       id="floatingName" v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
-                                                      placeholder="Nombre"> <label for="floatingName">Juridico</label></div>
+                                                      placeholder="Nombre"></div>
                   </div >
                   <div class="text-center">
                     <button @click="POST_PUT('licenciamiento/anexo71Musica/', dataAnexoPost, indice)"  class="miBtn btn btn-outline-light" type="button">
@@ -1610,38 +1654,43 @@ onMounted(() => {
                   <div class="col-md-6">
                     <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacion"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Locacion</label></div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.categoriaAudiovisual">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[14].TIPO_CATEGORIA_AUDIOVISUAL" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Tipo de Categoria</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Tipo de Categoria</label>
                     </div>
                   </div>
                   <div class="col-md-6">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                    <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa</label></div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de pago</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de entrega</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -1698,42 +1747,47 @@ onMounted(() => {
               <div v-if="indicadorAnexo==4">
                 <h4>Anexo CIMEX</h4>
                 <form class="row g-3">
-                  <div class="col-md-6">
+                  <div class="col-md-4">
                     <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacionModalidad"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Locacion/Modalidad</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Locacion/Modalidad</label></div>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.cantidadPlazas"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Cantidad de Plazas</label></div>
+                                                      id="idCantPlazas"
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Cantidad de Plazas</label></div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="text" class="styleInput form-control" @input="calcularImporte" v-model="dataAnexoPost.tarifa"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa</label></div>
                   </div>
-                  <div class="col-md-6">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importe"
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" readonly class="styleInput form-control" v-model="dataAnexoPost.importe"
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName">Importe</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de pago</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option  value="">----------</option>
                         <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de entrega</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -1794,47 +1848,52 @@ onMounted(() => {
                         <option v-for="item in CHOICES[14].TIPO_CATEGORIA_HOTELES" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Categoria</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Categoria</label>
                     </div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.numeroHabitacion"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Numero de Habitaciones</label></div>
+                                                      id="numeroHabitaciones"
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Numero de Habitaciones</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataAnexoPost.periodo"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Periodo</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Periodo</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaTemporadaAlta"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Temp. Alta</label></div>
+                                                      id="floatingName" @input="calcularImporteTempAlta"
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa Temp. Alta</label></div>
                   </div>
                   <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaTemporadaBaja"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Temp. Baja</label></div>
+                    <div class="form-floating"><input type="number" class="styleInput form-control"  v-model="dataAnexoPost.tarifaTemporadaBaja"
+                                                      id="floatingName" @input="calcularImporteTempBaja"
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa Temp. Baja</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifaOcupacionInferior"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa Ocupacion inferior del 30%</label></div>
+                                                      id="floatingName" @input="calcularImporteInferior"
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa Ocupacion inferior del 30%</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaAlta"
-                                                      id="floatingName"
+                                                      id="floatingName" readonly
                                                       placeholder="Nombre"> <label for="floatingName">Importe Temp. Alta</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaBaja"
-                                                      id="floatingName"
+                                                      id="floatingName" readonly
                                                       placeholder="Nombre"> <label for="floatingName">Importe Temp. Baja</label></div>
                   </div>
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importeTemporadaOcupacionInferior"
-                                                      id="floatingName"
+                                                      id="floatingName" readonly
                                                       placeholder="Nombre"> <label for="floatingName">Importe Ocupacion inferior del 30%</label></div>
                   </div>
                   <div class="col-md-4">
@@ -1843,7 +1902,7 @@ onMounted(() => {
                         <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de pago</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -1852,7 +1911,7 @@ onMounted(() => {
                         <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de entrega</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -1919,21 +1978,24 @@ onMounted(() => {
                   <div class="col-md-6">
                     <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo" class="styleInput form-control" v-model="dataAnexoPost.locacion"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Locacion</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Locacion</label></div>
                   </div>
                   <div class="col-md-6">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.modalidad">
+                        <option value="">-----------</option>
                         <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Modalidad</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Modalidad</label>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.tarifa"
                                                       id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName">Tarifa</label></div>
+                                                      placeholder="Nombre"> <label for="floatingName">
+                      <span class="text-danger">* </span>Tarifa</label></div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataAnexoPost.importe"
@@ -1943,19 +2005,21 @@ onMounted(() => {
                   <div class="col-md-3">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadPago">
+                        <option value="">-----------</option>
                         <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de pago</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
                     </div>
                   </div>
                   <div class="col-md-3">
                     <div class="form-floating mb-3">
                       <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataAnexoPost.periocidadEntrega">
+                        <option value="">-----------</option>
                         <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">{{ item.descripcion }}
                         </option>
                       </select>
-                      <label for="floatingSelect">Periocidad de entrega</label>
+                      <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
                     </div>
                   </div>
                   <div class="col-md-4">
@@ -2038,7 +2102,7 @@ onMounted(() => {
                       <td>{{ item.locacion }}</td>
                       <td>{{ item.modalidad }}</td>
                       <td>{{ item.tipoMusica }}</td>
-                      <td>{{ item.tarifa }}%</td>
+                      <td>{{ item.tarifa }}</td>
                       <td>{{ item.periocidadPago }}</td>
                       <td>{{ item.periocidadEntrega }}</td>
                     </tr>
@@ -2099,7 +2163,7 @@ onMounted(() => {
                     <tr v-for="(item, index) in anexo71AudiovisualAPI" :key="item.id">
                       <td>{{ item.locacion }}</td>
                       <td>{{ item.categoriaAudiovisual }}</td>
-                      <td>{{ item.tarifa }}%</td>
+                      <td>{{ item.tarifa }}</td>
                       <td>{{ item.periocidadPago }}</td>
                       <td>{{ item.periocidadEntrega }}</td>
                     </tr>
@@ -2261,8 +2325,8 @@ onMounted(() => {
                     <tr v-for="(item, index) in anexo72CimexAPI" :key="item.id">
                       <td>{{ item.locacionModalidad }}</td>
                       <td>{{ item.cantidadPlazas }}</td>
-                      <td>{{ item.tarifa }}%</td>
-                      <td>{{ item.importe }}%</td>
+                      <td>{{ item.tarifa }}</td>
+                      <td>{{ item.importe }}</td>
                       <td>{{ item.periocidadPago }}</td>
                       <td>{{ item.periocidadEntrega }}</td>
                     </tr>
@@ -2318,7 +2382,7 @@ onMounted(() => {
                       <th>Criterio</th>
                       <th>temporada alta (01/11 - 30/04)</th>
                       <th>temporada baja (01/05 - 31/10)</th>
-                      <th>Ocupación por debajo del 30 %</th>
+                      <th>Ocupación por debajo de 30 %</th>
                     </tr>
 
                     </thead>
@@ -2327,16 +2391,16 @@ onMounted(() => {
                       <td rowspan="2">{{ item.periodo }}</td>
                       <td>Tarifa</td>
                       <td>{{ item.tarifaTemporadaAlta }}</td>
-                      <td>{{ item.tarifaTemporadaBaja }}%</td>
-                      <td>{{ item.tarifaOcupacionInferior }}%</td>
+                      <td>{{ item.tarifaTemporadaBaja }}</td>
+                      <td>{{ item.tarifaOcupacionInferior }}</td>
                       <td rowspan="2">{{ item.periocidadPago }}</td>
                       <td rowspan="2">{{ item.periocidadEntrega }}</td>
                     </tr>
                     <tr v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
                       <td>Importe</td>
-                      <td>{{ item.importeTemporadaAlta }}%</td>
-                      <td>{{ item.importeTemporadaBaja }}%</td>
-                      <td>{{ item.importeTemporadaOcupacionInferior}}%</td>
+                      <td>{{ item.importeTemporadaAlta }}</td>
+                      <td>{{ item.importeTemporadaBaja }}</td>
+                      <td>{{ item.importeTemporadaOcupacionInferior}}</td>
                     </tr>
                     </tbody>
                   </table>
@@ -2395,7 +2459,7 @@ onMounted(() => {
                     <tr v-for="(item, index) in anexo72TrdAPI" :key="item.id">
                       <td>{{ item.locacion }}</td>
                       <td>{{ item.modalidad }}</td>
-                      <td>{{ item.importe }}%</td>
+                      <td>{{ item.importe }}</td>
                       <td>{{ item.periocidadPago }}</td>
                       <td>{{ item.periocidadEntrega }}</td>
                     </tr>
