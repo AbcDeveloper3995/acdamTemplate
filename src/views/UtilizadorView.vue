@@ -222,6 +222,7 @@ onMounted(() => {
                     <th scope="col">Tipo</th>
                     <th scope="col">Tipo no estatal</th>
                     <th scope="col">Tipo derecho</th>
+                    <th scope="col">Tiene Contrato</th>
                   </tr>
                   </thead>
                   <tbody>
@@ -239,6 +240,8 @@ onMounted(() => {
                     <td><i :class="item.tipoNoEstatal == ''?'bi bi-x-circle-fill':''"
                            :style="item.tipoNoEstatal == ''?'color: red':''"></i>{{item.tipoNoEstatal}}</td>
                     <td>{{ item.tipoDerecho }}</td>
+                    <td><i :class="item.tieneContrato?'bi bi-check-circle-fill':'bi bi-x-circle-fill'"
+                           :style="item.tieneContrato?'color: green':'color: red'"></i></td>
                   </tr>
                   </tbody>
                 </table>

@@ -72,6 +72,12 @@ const router = createRouter({
       meta: {requiresAuth:true}
     },
     {
+      path: '/clasificadorProforma',
+      name: 'clasificadorProforma',
+      component: () => import('../views/clasificadorProformaView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
       path: '/recaudacion',
       name: 'recaudacion',
       component: () => import('../views/RecaudacionView.vue'),

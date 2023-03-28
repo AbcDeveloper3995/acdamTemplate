@@ -160,7 +160,6 @@ const onChangeCurrentTab = (index, oldIndex) => {
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 2) {
-    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaJuridica/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -201,11 +200,11 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
           lastContrato.value.codigo = response.data.codigo
         })
         .catch((error) => {
+          currentTabIndex==2?indiceNextButton.value=true:''
           mensaje('error','Error', error.response.data.error)
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 3) {
-    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -246,11 +245,11 @@ Comunicacion al publico de obras audiovisuales: ______Si _______No</h3>
           lastContrato.value.codigo = response.data.codigo
         })
         .catch((error) => {
+          currentTabIndex==2?indiceNextButton.value=true:''
           mensaje('error','Error', error.response.data.error)
         })
   }
   if (currentTabIndex === 2 && objProforma.value.tipoProforma == 4) {
-    currentTabIndex==1?indiceNextButton.value=true:''
     let url = `licenciamiento/contratoLicenciaPersonaNatural/${dataPost.value.fk_usuario}/getlastContrato/`
     axios.get(url)
         .then((response) => {
@@ -281,6 +280,7 @@ Telefono: _____________________ Email: ___________________</h3>
           lastContrato.value.codigo = response.data.codigo
         })
         .catch((error) => {
+          currentTabIndex==2?indiceNextButton.value=true:''
           mensaje('error','Error', error.response.data.error)
         })
   }

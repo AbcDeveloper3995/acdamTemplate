@@ -14,16 +14,15 @@ const router =useRouter()
 const {mensaje} = notificaciones()
 const indice = indiceActualizado //VARIABLE QUE CONTROLA EL COMPORTAMIENTO DEL FORMULARIO DEPENDIENDO SI SE CREAR O SE EDITA
 const expandir = expandirActualizado //VARIABLE QUE CONTROLA SI SE EXPANDE O SE CONTRAE EL FORMULARIO
+const clasificadorAPI = ref([])
 const proformaAPI = ref([])
+const sectorAPI = ref([])
 const dataPost = ref({
   pk: '',
-  resolucion: null,
-  titulo: '',
-  nombre: '',
-  encabezado: '',
-  descripcion: '',
-  descripcion2daParte: '',
-  descripcion3raParte: '',
+  fk_proforma: null,
+  fk_sector: '',
+  tipo: '',
+  tipoDerecho: '',
 })
 
 let loading = ref(false)
@@ -35,15 +34,16 @@ let paginaActual = 0
 //PETICION GET PARA OBTENER LOS CARGOS YA PAGINADOS
 const getProformasPaginados = async (NoPagina = 1) => {
   try {
-    let url = `licenciamiento/proforma/${NoPagina}/paginado`
+    let url = `licenciamiento/clasificadorProforma/${NoPagina}/paginado`
     loading = true
     let response = await axios.get(url)
+    console.log(response.data)
     loading = false
-    proformaAPI.value = response.data.items
+    clasificadorAPI.value = response.data.items
     totalPaginas = response.data.totalPaginas
     paginaActual = response.data.paginaActual
     if (response.status == 200) {
-      console.log('proforma cargados')
+      console.log('configuraciones cargados')
     }
   } catch (error) {
     console.log("error: ", error.response.data.detail)
@@ -51,31 +51,9 @@ const getProformasPaginados = async (NoPagina = 1) => {
   }
 }
 
-//FUNCION QUE BUSCAR EL CARGO A EDITAR Y PINTAR SUS DATOS EN EL FORMULARIO PARA SU POSTERIOR EDICION
-const editarProforma = async (item, index) => {
-  expandir.value = false
-  indice.value = index
-  let url = `licenciamiento/proforma/${item.id}/`
-  axios.get(url)
-      .then((response) => {
-        console.log(response.data.data.descripcion3raParte)
-        dataPost.value.pk = response.data.data.id
-        dataPost.value.nombre = response.data.data.nombre
-        dataPost.value.titulo = response.data.data.titulo
-        dataPost.value.resolucion = response.data.data.resolucion
-        dataPost.value.encabezado = response.data.data.encabezado
-        dataPost.value.descripcion = response.data.data.descripcion
-        dataPost.value.descripcion2daParte = response.data.data.descripcion2daParte
-        dataPost.value.descripcion3raParte = response.data.data.descripcion3raParte
-      })
-      .catch((error) => {
-        mensaje('error','Error', error.response.data.error)
-      })
-}
-
 //PROCEDIMIENTO PARA FILTRAR EN LA TABLA
-const listaFiltrada = () => proformaAPI.value.filter((item) =>
-    item.nombre.toLowerCase().includes(buscar.value.toLowerCase())
+const listaFiltrada = () => clasificadorAPI.value.filter((item) =>
+    item.fk_proforma.toLowerCase().includes(buscar.value.toLowerCase())
 );
 
 //PROCEDIMIENTO PARA EL PAGINADO
@@ -97,6 +75,8 @@ const isActive = (pagina) => {
 
 onMounted(() => {
   getProformasPaginados()
+  GET("licenciamiento/sector/", sectorAPI)
+  GET("licenciamiento/proforma/", proformaAPI)
 })
 </script>
 
@@ -107,7 +87,7 @@ onMounted(() => {
       <nav>
         <ol class="breadcrumb">
           <li class="breadcrumb-item"><a href="#" @click="router.push('/home')"><i class="bi bi-house-fill"></i></a></li>
-          <li class="breadcrumb-item active">Proforma</li>
+          <li class="breadcrumb-item active">Configuracion Proforma</li>
         </ol>
       </nav>
     </div>
@@ -120,7 +100,7 @@ onMounted(() => {
               <a class="nav-link collapsed" style="background: None" data-bs-target="#formularioProforma"
                  data-bs-toggle="collapse" href="#"
                  aria-expanded="false"> <i class="bi-plus-circle"></i>
-                <strong>{{ indice == -1 ? 'Nuevo proforma' : 'Actualizar proforma' }}</strong><i
+                <strong>{{ indice == -1 ? 'Nuevo configuracion' : 'Actualizar configuracion' }}</strong><i
                     class="bi bi-chevron-down ms-auto"></i>  </a>
 
             </ul>
@@ -129,54 +109,46 @@ onMounted(() => {
               <form class="row g-3">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Proforma" v-model="dataPost.resolucion">
-                      <option value="">------------</option>
-                      <option v-for="item in CHOICES[1].RESOLUCION" :key="item.value" :value="item.value">{{ item.descripcion }}
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector">
+                      <option  value="">----------</option>
+                      <option v-for="item in proformaAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Resolucion</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Proforma</label>
                   </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Nombre</label></div>
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector">
+                      <option  value="">----------</option>
+                      <option v-for="item in sectorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Sector</label>
+                  </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.titulo"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Titulo</label></div>
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="habilitarTipoNoEstatal" v-model="dataPost.tipo">
+                      <option  value="">----------</option>
+                      <option v-for="item in CHOICES[0].UTILIZADOR" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Tipo</label>
+                  </div>
                 </div>
                 <div class="col-md-6">
-                  <div class="form-floating">
-                    <textarea type="text" class="styleInput form-control" v-model="dataPost.encabezado"
-                              id="floatingName"
-                              placeholder="Nombre"></textarea> <label for="floatingName">
-                    <span class="text-danger">* </span>Encabezado</label></div>
-                </div>
-                <div class="col-md-12">
-                  <div class="form-floating">
-                    <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion"
-                              id="floatingName"
-                              placeholder="Nombre"></textarea> <label for="floatingName">
-                    <span class="text-danger">* </span>Descripcion</label></div>
-                </div>
-                <div class="col-md-12">
-                  <div class="form-floating">
-                    <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion2daParte"
-                              id="floatingName"
-                              placeholder="Nombre"></textarea> <label for="floatingName">Descripcion Segunda Parte</label></div>
-                </div>
-                <div class="col-md-12">
-                  <div class="form-floating">
-                    <textarea type="text" class="styleInput form-control" v-model="dataPost.descripcion3raParte"
-                              id="floatingName"
-                              placeholder="Nombre"></textarea> <label for="floatingName">Descripcion Tercera Parte</label></div>
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.tipoDerecho">
+                      <option  value="">----------</option>
+                      <option v-for="item in CHOICES[2].DERECHOS" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Derecho</label>
+                  </div>
                 </div>
                 <div class="text-center">
-                  <button @click="POST_PUT('licenciamiento/proforma/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
+                  <button @click="POST_PUT('licenciamiento/clasificadorProforma/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> {{ indice == -1 ? 'Agregar' : 'Actualizar' }}</button>
                   <button v-if="indice==-1" type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                 </div>
@@ -190,7 +162,7 @@ onMounted(() => {
         <div class="col-lg-12">
           <div class="card glassmorphism">
             <div class="card-body">
-              <h5 class="card-title"><i class="bi bi-layout-text-window-reverse"></i><strong> Listado de Proformas</strong></h5>
+              <h5 class="card-title"><i class="bi bi-layout-text-window-reverse"></i><strong> Configuracion Proformas</strong></h5>
               <div class="row">
                 <div class="col-sm-2">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="buscar"
@@ -216,24 +188,25 @@ onMounted(() => {
                   <thead>
                   <tr>
                     <th scope="col">Acciones</th>
-                    <th scope="col">Nombre</th>
-                    <th scope="col">Titulo</th>
-                    <th scope="col">Resolucion</th>
+                    <th scope="col">Proforma</th>
+                    <th scope="col">Sector</th>
+                    <th scope="col">Tipo</th>
+                    <th scope="col">Derecho</th>
                   </tr>
                   </thead>
                   <tbody>
                   <div v-if="loading"><span class="loader"></span></div>
                   <tr v-for="(item, index) in listaFiltrada()" :key="item.id">
                     <td>
-                        <span class="sombra badge bg-primary" @click="editarProforma(item, index)" title="Modificar"><i
-                            class="bi bi-pencil"></i></span>
-                      <span class="sombra badge bg-danger m-lg-1" @click="DELETE('licenciamiento/proforma/'+item.id)"
+                      <span class="sombra badge bg-danger m-lg-1" @click="DELETE('licenciamiento/clasificadorProforma/'+item.id)"
                             title="Eliminar"><i class="bi bi-trash"></i></span>
                     </td>
-                    <td>{{ item.nombre }}</td>
-                    <td>{{ item.titulo }}</td>
-                    <td><i :class="item.resolucion === null?'bi bi-x-circle-fill':''"
-                           :style="item.resolucion === null?'color: red':''"></i>{{item.resolucion}}</td>
+                    <td>{{ item.fk_proforma }}</td>
+                    <td><i :class="item.fk_sector == ''?'bi bi-x-circle-fill':''"
+                           :style="item.fk_sector == ''?'color: red':''"></i>{{item.fk_sector}}</td>
+                    <td>{{ item.tipo }}</td>
+                    <td><i :class="item.tipoDerecho == ''?'bi bi-x-circle-fill':''"
+                           :style="item.tipoDerecho == ''?'color: red':''"></i>{{item.tipoDerecho}}</td>
                   </tr>
                   </tbody>
                 </table>
