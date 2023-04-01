@@ -115,5 +115,14 @@ const CHOICES = [
             {value: '5estrellas', descripcion: '5 Estrellas'},
         ]
     },
+    {
+        CHOICE_TIPO_PROFORMA: [
+            {value: 1, descripcion: 'Estatal'},
+            {value: 2, descripcion: 'No estatal persona juridica (Contrato MIPYME)'},
+            {value: 3, descripcion: 'No estatal persona natural (Contrato Ejecucion Publica)'},
+            {value: 4, descripcion: 'No estatal persona natural (Contrato Comprador Vendedor de Disco)'},
+            {value: 5, descripcion: 'Representante'},
+        ]
+    },
 ]
 export default CHOICES

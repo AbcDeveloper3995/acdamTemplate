@@ -24,6 +24,7 @@ const dataPost = ref({
   descripcion: '',
   descripcion2daParte: '',
   descripcion3raParte: '',
+  tipo: null,
 })
 
 let loading = ref(false)
@@ -58,10 +59,10 @@ const editarProforma = async (item, index) => {
   let url = `licenciamiento/proforma/${item.id}/`
   axios.get(url)
       .then((response) => {
-        console.log(response.data.data.descripcion3raParte)
         dataPost.value.pk = response.data.data.id
         dataPost.value.nombre = response.data.data.nombre
         dataPost.value.titulo = response.data.data.titulo
+        dataPost.value.tipo = response.data.data.tipo
         dataPost.value.resolucion = response.data.data.resolucion
         dataPost.value.encabezado = response.data.data.encabezado
         dataPost.value.descripcion = response.data.data.descripcion
@@ -127,29 +128,39 @@ onMounted(() => {
             <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioProforma"
                  data-bs-parent="#cardFormulario">
               <form class="row g-3">
-                <div class="col-md-6">
+                <div class="col-md-3">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Proforma" v-model="dataPost.resolucion">
                       <option value="">------------</option>
                       <option v-for="item in CHOICES[1].RESOLUCION" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
-                    <label for="floatingSelect">Resolucion</label>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Resolucion</label>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombre"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">
                     <span class="text-danger">* </span>Nombre</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.titulo"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">
                     <span class="text-danger">* </span>Titulo</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Proforma" v-model="dataPost.tipo">
+                      <option value="">------------</option>
+                      <option v-for="item in CHOICES[15].CHOICE_TIPO_PROFORMA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Tipo</label>
+                  </div>
+                </div>
+                <div class="col-md-12">
                   <div class="form-floating">
                     <textarea type="text" class="styleInput form-control" v-model="dataPost.encabezado"
                               id="floatingName"

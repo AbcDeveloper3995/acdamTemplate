@@ -2541,10 +2541,16 @@ onMounted(() => {
           </div>
         </div>
         <div class="col-lg-1" v-for="item in contratoEstatalAPI" :key="item.id" :value="item.id" style="margin-bottom: 15px">
-          <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
+          <span v-if="item.estadoVigencia==1" class="badge bg-success" style="margin-bottom: 5px"><i class="bi bi-check-circle"> Vigente</i></span>
+          <span v-if="item.estadoVigencia==2" class="badge bg-warning text-dark" style="margin-bottom: 5px"><i class="bi bi-exclamation-circle"> Por Vencer</i></span>
+          <span v-if="item.estadoVigencia==3" class="badge bg-danger" style="margin-bottom: 5px"><i class="bi bi-x-circle"> Expirado</i></span>
+          <img src="../assets/img/img-contrato3.jpg" class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
           <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#id'+item.id" title="Detalles"><i
               class="bi bi-file-earmark-pdf"></i></span>
-<!--          MODAL-->
+          <span class="sombra badge bg-primary"  title="Hacer suplemento" style="margin-left: 2px"><i class="bi bi-file-break"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaEstatal/'+item.id)"></i></span>
+          <!--          MODAL-->
           <div class="modal fade" :id="'id'+item.id" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
               <div class="modal-content">
@@ -2572,10 +2578,7 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
-              class="bi bi-pencil"></i></span>
-          <span class="sombra badge bg-danger" style="margin-left: 2px"
-                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaEstatal/'+item.id)"></i></span>
+
         </div>
 
 <!--        NO ESTATLES JURIDICOS-->
@@ -2593,6 +2596,10 @@ onMounted(() => {
           <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
           <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#idJuridico'+item.id" title="Detalles"><i
               class="bi bi-file-earmark-pdf"></i></span>
+          <span class="sombra badge bg-primary"  title="Hacer suplemento" style="margin-left: 2px"><i class="bi bi-file"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash"
+                                    @click="DELETE('licenciamiento/contratoLicenciaPersonaJuridica/'+item.id)"></i></span>
           <!--          MODAL-->
           <div class="modal fade" :id="'idJuridico'+item.id" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -2625,10 +2632,8 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
-              class="bi bi-pencil"></i></span>
-          <span class="sombra badge bg-danger" style="margin-left: 2px"
-                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaPersonaJuridica/'+item.id)"></i></span>
+
+
         </div>
 
 <!--        NO ESTATALES NATURALES-->
@@ -2646,6 +2651,10 @@ onMounted(() => {
           <img src="../assets/img/img-contrato3.jpg"  class="glassmorphism card-img-top" style="height: 6rem; margin-bottom: 5px" alt="...">
           <span class="sombra badge bg-secondary" data-bs-toggle="modal" :data-bs-target="'#idNatural'+item.id" title="Detalles"><i
               class="bi bi-file-earmark-pdf"></i></span>
+          <span class="sombra badge bg-primary"  title="Hacer suplemento" style="margin-left: 2px"><i class="bi bi-file"></i></span>
+          <span class="sombra badge bg-danger" style="margin-left: 2px"
+                title="Eliminar"><i class="bi bi-trash"
+                                    @click="DELETE('licenciamiento/contratoLicenciaPersonaNatural/'+item.id)"></i></span>
           <!--          MODAL-->
           <div class="modal fade" :id="'idNatural'+item.id" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
@@ -2674,10 +2683,7 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
-              class="bi bi-pencil"></i></span>
-          <span class="sombra badge bg-danger" style="margin-left: 2px"
-                title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoLicenciaPersonaNatural/'+item.id)"></i></span>
+
         </div>
       </div>
     </section>

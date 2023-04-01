@@ -17,12 +17,12 @@ import {RouterLink} from 'vue-router'
       <span class="nav-heading text-black" style="font-size: 15px">Recaudacion</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-thunderbolt-fill"></i><RouterLink to="/recaudacion">Recaudacion</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-terminal-x"></i><RouterLink to="/reporteCobro">Reporte de cobro</RouterLink></a></li>
-      <span class="nav-heading text-black" style="font-size: 15px">Juridico</span>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-send-exclamation-1"></i><RouterLink to="/reclamaciones">Reclamaciones</RouterLink></a></li>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-motherboard-fill"></i><RouterLink to="/contratos">Contratos</RouterLink></a></li>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-app-indicator"></i><RouterLink to="/controlServiciosJuridicos">Control servicios juridicos</RouterLink></a></li>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-backspace"></i><RouterLink to="/controlPagosServiciosJuridicos">Control pago servicios juridicos</RouterLink></a></li>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-bag-x"></i><RouterLink to="/reportes">Reportes</RouterLink></a></li>
+<!--      <span class="nav-heading text-black" style="font-size: 15px">Juridico</span>-->
+<!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-send-exclamation-1"></i><RouterLink to="/reclamaciones">Reclamaciones</RouterLink></a></li>-->
+<!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-motherboard-fill"></i><RouterLink to="/contratos">Contratos</RouterLink></a></li>-->
+<!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-app-indicator"></i><RouterLink to="/controlServiciosJuridicos">Control servicios juridicos</RouterLink></a></li>-->
+<!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-backspace"></i><RouterLink to="/controlPagosServiciosJuridicos">Control pago servicios juridicos</RouterLink></a></li>-->
+<!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-bag-x"></i><RouterLink to="/reportes">Reportes</RouterLink></a></li>-->
 
       <span class="nav-heading text-black" style="font-size: 15px">Administracion</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-bookmark"></i><RouterLink to="/proforma">Proformas</RouterLink></a></li>

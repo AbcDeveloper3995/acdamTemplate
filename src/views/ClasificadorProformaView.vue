@@ -19,7 +19,7 @@ const proformaAPI = ref([])
 const sectorAPI = ref([])
 const dataPost = ref({
   pk: '',
-  fk_proforma: null,
+  fk_proforma: '',
   fk_sector: '',
   tipo: '',
   tipoDerecho: '',
@@ -109,7 +109,7 @@ onMounted(() => {
               <form class="row g-3">
                 <div class="col-md-6">
                   <div class="form-floating mb-3">
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sector">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_proforma">
                       <option  value="">----------</option>
                       <option v-for="item in proformaAPI" :key="item.id" :value="item.id">{{ item.nombre }}
                       </option>

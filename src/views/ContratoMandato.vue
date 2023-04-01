@@ -75,8 +75,6 @@ onMounted(() => {
               </div>
             </div>
           </div>
-          <span class="sombra badge bg-primary"  title="Modificar" style="margin-left: 2px"><i
-              class="bi bi-pencil"></i></span>
           <span class="sombra badge bg-danger" style="margin-left: 2px"
                 title="Eliminar"><i class="bi bi-trash" @click="DELETE('licenciamiento/contratoMandato/'+item.id)"></i></span>
         </div>
