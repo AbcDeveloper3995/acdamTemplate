@@ -358,11 +358,11 @@ const agingarValorIndicadorAnexo = (event) => {
 }
 
 // FUNCIONES PARA ACTUALIZAR EL LISTADO DE LOS ANEXO QUE SE VAN CREANDO
-const actualizarAnexos71Musica = () => GET('licenciamiento/anexo71Musica/', anexo71MusicaAPI)
-const actualizarAnexos71Audiovisual = () => GET('licenciamiento/anexo71Audiovisual/', anexo71AudiovisualAPI)
-const actualizarAnexos72Cimex = () => GET('licenciamiento/anexo72Cimex/', anexo72CimexAPI)
-const actualizarAnexos72Gaviota = () => GET('licenciamiento/anexo72Gaviota/', anexo72GaviotaAPI)
-const actualizarAnexos72Trd = () => GET('licenciamiento/anexo72Trd/', anexo72TrdAPI)
+const actualizarAnexos71Musica = (id) => GET(`licenciamiento/anexo71Musica/${id}/getAnexosDeUnContrato/`, anexo71MusicaAPI)
+const actualizarAnexos71Audiovisual = (id) => GET(`licenciamiento/anexo71Audiovisual/${id}/getAnexosDeUnContrato/`, anexo71AudiovisualAPI)
+const actualizarAnexos72Cimex = (id) => GET(`licenciamiento/anexo72Cimex/${id}/getAnexosDeUnContrato/`, anexo72CimexAPI)
+const actualizarAnexos72Gaviota = (id) => GET(`licenciamiento/anexo72Gaviota/${id}/getAnexosDeUnContrato/`, anexo72GaviotaAPI)
+const actualizarAnexos72Trd = (id) => GET(`licenciamiento/anexo72Trd/${id}/getAnexosDeUnContrato/`, anexo72TrdAPI)
 
 // FUNCION PARA REASIGNAR EL ID AL CAMPO CONTRATO DEL ANEXO
 const asignarIdAlCampoContratoDelAnexo = () => {
@@ -375,7 +375,7 @@ const asignarIdAlCampoContratoDelAnexo = () => {
   contratoAnexo71Audiovisual.value!=null?contratoAnexo71Audiovisual.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
   contratoAnexo72Cimex.value!=null?contratoAnexo72Cimex.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
   contratoAnexo72Trd.value!=null?contratoAnexo72Trd.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
-  contratoAnexo71Musica.value!=null?contratoAnexo71Musica.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
+  contratoAnexo72Gaviota.value!=null?contratoAnexo72Gaviota.value = dataAnexoPost.value.fk_contratoLicenciaEstatal:''
   // contratoAnexo71Audiovisual.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
   // contratoAnexo72Cimex.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
   // contratoAnexo72Gaviota.value = dataAnexoPost.value.fk_contratoLicenciaEstatal
@@ -623,12 +623,12 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.codigoREEUP"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo REEUP</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Codigo REEUP</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.nit"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>NIT</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">NIT</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaBancaria"
@@ -638,7 +638,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.titular"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Titular de cuenta</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Titular de cuenta</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.banco"
@@ -648,7 +648,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.sucursal"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Sucursal</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Sucursal</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.direccionBanco"
@@ -732,7 +732,6 @@ onMounted(() => {
             <p class="text-center"><span v-if="currentTabIndex === 1 && objProforma.tipoProforma == 2"
                   class="text-uppercase badge rounded-pill bg-light text-dark" style="font-size: 15px; margin-bottom: 10px">
               Contrato no estatal juridico</span></p>
-
             <div v-if="currentTabIndex === 1 && objProforma.tipoProforma == 2">
               <div class="col-md-9">
                 <div class="col-sm-10">
@@ -804,14 +803,12 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.codigoOnei"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Codigo Onei</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Codigo Onei</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.nit"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>NIT</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">NIT</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaCorriente"
@@ -828,8 +825,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.sucursal"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Sucursal</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Sucursal</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.nombreFirmanteContrato"
@@ -1067,8 +1063,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.nit"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>NIT</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">NIT</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaCorriente"
@@ -1085,8 +1080,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.sucursal"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Sucursal</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Sucursal</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.tarifa"
@@ -1288,8 +1282,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.nit"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>NIT</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">NIT</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.cuentaCorriente"
@@ -1306,8 +1299,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.sucursal"
                                                     id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Sucursal</label></div>
+                                                    placeholder="Nombre"> <label for="floatingName">Sucursal</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
@@ -1424,7 +1416,7 @@ onMounted(() => {
                   <br>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>POR LA ACDAM:</p>
-                    <p>POR EL PRODUCTOR:</p>
+                    <p>POR EL UTILIZADOR:</p>
                   </div>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>_______________________ </p>
@@ -1459,7 +1451,7 @@ onMounted(() => {
                   <br>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>POR LA ACDAM:</p>
-                    <p>POR EL PRODUCTOR:</p>
+                    <p>POR EL UTILIZADOR:</p>
                   </div>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>_______________________ </p>
@@ -1494,7 +1486,7 @@ onMounted(() => {
                   <br>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>POR LA ACDAM:</p>
-                    <p>POR EL PRODUCTOR:</p>
+                    <p>POR EL UTILIZADOR:</p>
                   </div>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>_______________________ </p>
@@ -1529,7 +1521,7 @@ onMounted(() => {
                   <br>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>POR LA ACDAM:</p>
-                    <p>POR EL PRODUCTOR:</p>
+                    <p>POR EL UTILIZADOR:</p>
                   </div>
                   <div class="d-flex align-items-center justify-content-between">
                     <p>_______________________ </p>
@@ -1678,7 +1670,7 @@ onMounted(() => {
                   </table>
                 </div>
                 <div class="text-center">
-                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Musica"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Musica(dataAnexoPost.fk_contratoLicenciaEstatal)"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
                 </div>
               </div>
 
@@ -1774,7 +1766,7 @@ onMounted(() => {
                   </table>
                 </div>
                 <div class="text-center">
-                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Audiovisual"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos71Audiovisual(dataAnexoPost.fk_contratoLicenciaEstatal)"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
                 </div>
               </div>
 
@@ -1868,7 +1860,7 @@ onMounted(() => {
                   </table>
                 </div>
                 <div class="text-center">
-                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Cimex"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Cimex(dataAnexoPost.fk_contratoLicenciaEstatal)"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
                 </div>
               </div>
 
@@ -2002,7 +1994,7 @@ onMounted(() => {
                   </table>
                 </div>
                 <div class="text-center">
-                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Gaviota"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Gaviota(dataAnexoPost.fk_contratoLicenciaEstatal)"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
                 </div>
               </div>
 
@@ -2100,7 +2092,7 @@ onMounted(() => {
                   </table>
                 </div>
                 <div class="text-center">
-                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Trd"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
+                  <button class="miBtn btn btn-outline-light" type="button" @click="actualizarAnexos72Trd(dataAnexoPost.fk_contratoLicenciaEstatal)"><i class="bi bi-arrow-repeat"></i> Actualizar </button>
                 </div>
               </div>
             </div>
@@ -2362,7 +2354,7 @@ onMounted(() => {
                       <td>{{ item.cantidadPlazas }}</td>
                       <td>{{ item.tarifa }}</td>
                       <td>{{ item.importe }}</td>
-                      <td>{{ item.periocidadPago }}</td>
+                      <td>{{ item.periocidadPago }} dentro de los 30 dias naturales posteriores a la fecha de recepcion de la factura</td>
                       <td>{{ item.periocidadEntrega }}</td>
                     </tr>
                     </tbody>
@@ -2563,6 +2555,8 @@ onMounted(() => {
                   <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Numero de licencia
                       <span class="badge bg-primary rounded-pill">{{ item.numeroLicencia }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Codigo
+                      <span class="badge bg-primary rounded-pill">{{ item.codigo }}</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Fecha de creacion
                       <span class="badge bg-primary rounded-pill">{{ item.fechaCreacionContrato }}</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Subordinacion
@@ -2668,6 +2662,8 @@ onMounted(() => {
                   <ul class="list-group">
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Numero de licencia
                       <span class="badge bg-primary rounded-pill">{{ item.numeroLicencia }}</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Codigo
+                      <span class="badge bg-primary rounded-pill">{{ item.codigo }}</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Fecha de creacion
                       <span class="badge bg-primary rounded-pill">{{ item.fechaCreacionContrato }}</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Modalidad
