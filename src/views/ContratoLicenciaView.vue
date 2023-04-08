@@ -524,6 +524,7 @@ const conformarPDFdelSuplemento = () => {
                                   <h3>Ambas partes, reconociendose mutuamente la representacion con que comparecen a este acto y la capacidad legal necesaria para contratar y obligarse, suscriben el presente Suplemento para prorrogar el periodo de vigencia de contrato-licencia suscrito, conforme se acuerdan en las siguientes,</h3>
                                   <h3><strong>CLAUSULAS</strong></h3>
                                   <h3>${response.data.descripcion}</h3>
+                                  <h3>Y como muestra de conformidad y aceptación, las partes suscriben el presente contrato, en dos (3) ejemplares, a un mismo tenor y efectos legales, en La Habana, a los ${dia} días del mes de ${mes} de ${ano}.</h3>
                                    `
         lastSuplemento.value.firmanteSuplemento = response.data.firmanteSuplemento
         lastSuplemento.value.cargofirmanteSuplemento = response.data.cargoFirmanteSuplemento
@@ -534,6 +535,32 @@ const conformarPDFdelSuplemento = () => {
       })
 }
 
+//FUNCION QUE VA A BUSCAR QUE TIPO DE ANEXOS TIENE EL CONTRATO ESTATAL EN CUESTION U LUEGO LO RENDERIZA
+const getAnexos = (id, resolucion) => {
+  let url = `licenciamiento/contratoLicenciaEstatal/${id}-${resolucion}/getAnexos/`
+  axios.get(url)
+      .then((response) => {
+        indicadorAnexo.value = response.data.indicador
+        if(response.data.indicador==1){
+          actualizarAnexos71Musica(id)
+        }
+        if(response.data.indicador==2){
+          actualizarAnexos71Audiovisual(id)
+        }
+        if(response.data.indicador==3){
+          actualizarAnexos72Cimex(id)
+        }
+        if(response.data.indicador==4){
+          actualizarAnexos72Gaviota(id)
+        }
+        if(response.data.indicador==5){
+          actualizarAnexos72Trd(id)
+        }
+      })
+      .catch((error) => {
+        mensaje('error', 'Error', error.response.data.error)
+      })
+}
 onMounted(() => {
   GET("licenciamiento/utilizador/getUtilizadoresSinContrato/", utilizadorAPI)
   GET("licenciamiento/representante/", representanteAPI)
@@ -621,7 +648,8 @@ onMounted(() => {
                      class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert">
                   <h5><i class="bi bi-person-bounding-box"></i><strong> Datos del utilizador:</strong></h5>
                   <hr>
-                  <p>Tipo: No estatal ({{ objUtilizador.tipoNoEstatal }}) </p>
+                  <p v-if="objUtilizador.tipoNoEstatal=='PN'">Tipo: No Estatal <span style="color:red;">Persona Natural</span> </p>
+                  <p v-if="objUtilizador.tipoNoEstatal=='PJ'">Tipo: No Estatal <span style="color:red;">Persona Juridica</span> </p>
                   <p>Sector: {{ objUtilizador.sector }}</p>
                   <p>Derecho: {{ objUtilizador.derecho }}</p>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -2936,6 +2964,9 @@ onMounted(() => {
           <span class="sombra badge bg-primary" title="Hacer suplemento" @click="mostrarSuplementoSegunValorIndice(item.id, 1)"
                 style="margin-left: 2px"><i
               class="bi bi-file-break"></i></span>
+          <span class="sombra badge bg-black" @click="getAnexos(item.id, item.resolucion)" data-bs-toggle="modal" :data-bs-target="'#anexos'+item.id"
+                title="Anexos"><i
+              class="bi bi-pencil-square"></i></span>
           <span class="sombra badge bg-danger" style="margin-left: 2px"
                 title="Eliminar"><i class="bi bi-trash"
                                     @click="DELETE('licenciamiento/contratoLicenciaEstatal/'+item.id)"></i></span>
@@ -2964,6 +2995,673 @@ onMounted(() => {
                       <span class="badge bg-primary rounded-pill">{{ item.cargoFirmanteContrato }}</span></li>
                   </ul>
                 </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!--          MODAL PARA MODIFICAR ANEXOS-->
+          <div class="modal fade" :id="'anexos'+item.id" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title"><i class="bi bi-file-earmark-pdf"></i> <strong> Contrato con:</strong>
+                    {{ item.utilizador }} <span style="color: #0c63e4">(Modificacion de anexo)</span></h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+
+<!--                MODIFICAR ANEXO MUSICA-->
+                <div class="modal-body" v-if="indicadorAnexo==1">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Anexo Musica</strong></h4>
+                    <p>Este contrato cuenta con anexos del tipo musica, para modificar algun campo presione en la accion en la tabla.</p>
+                  </div>
+                  <form class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"
+                                                        class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Locacion</label></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.modalidad">
+                          <option value="">----------</option>
+                          <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect">
+                          <span class="text-danger">* </span>Modalidad</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.tipoMusica">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[11].TIPO_OBRA_COMERCIAL" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect">
+                          <span class="text-danger">* </span>Tipo de Musica</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating"><input type="text" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifa"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa</label></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadPago">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadEntrega">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"  readonly
+                                                        id="contratoAnexo71Musica" hidden
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div v-if="objProforma.tipoProforma!=1" class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control" readonly
+                                                        id="floatingName" hidden
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div class="text-center">
+                      <button
+                          @click="POST_PUT('licenciamiento/anexo71Musica/', dataAnexoPost, indice); habilitarNextButton()"
+                          class="miBtn btn btn-outline-dark" type="button">
+                        <i class="bi bi-arrow-bar-right"></i> Salvar
+                      </button>
+                      <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear
+                      </button>
+                    </div>
+                  </form>
+                  <hr>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th scope="col">Acciones</th>
+                        <th scope="col">Locacion</th>
+                        <th scope="col">Modalidad</th>
+                        <th scope="col">Tipo de musica</th>
+                        <th scope="col">Tarifa</th>
+                        <th scope="col">Periocidad de Pago</th>
+                        <th scope="col">Periocidad de Entrega</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="(item, index) in anexo71MusicaAPI" :key="item.id">
+                        <td>
+                        <span class="sombra badge bg-primary" title="Modificar"
+                              @click="editarAnexo(`licenciamiento/anexo71Musica/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                        </td>
+                        <td>{{ item.locacion }}</td>
+                        <td>{{ item.modalidad }}</td>
+                        <td>{{ item.tipoMusica }}</td>
+                        <td>{{ item.tarifa }}</td>
+                        <td>{{ item.periocidadPago }}</td>
+                        <td>{{ item.periocidadEntrega }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center">
+                    <button class="miBtn btn btn-outline-dark" type="button"
+                            @click="actualizarAnexos71Musica(dataAnexoPost.fk_contratoLicenciaEstatal)"><i
+                        class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+
+<!--                MODIFICAR ANEXO AUDIOVISUAL-->
+                <div class="modal-body" v-if="indicadorAnexo==2">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Anexo AudioVisual</strong></h4>
+                    <p>Este contrato cuenta con anexos del tipo audivisual, para modificar algun campo presione en la accion en la tabla.</p>
+                  </div>
+                  <form class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"
+                                                        class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Locacion</label></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.categoriaAudiovisual">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[14].TIPO_CATEGORIA_AUDIOVISUAL" :key="item.value"
+                                  :value="item.value">{{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Tipo de Categoria</label>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating"><input type="text" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifa"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa</label></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadPago">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadEntrega">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        hidden readonly id="contratoAnexo71Audiovisual"
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control" readonly
+                                                        id="floatingName" hidden
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaPersonaJ"
+                                                        placeholder="Nombre">
+                      </div>
+                    </div>
+                    <div class="text-center">
+                      <button
+                          @click="POST_PUT('licenciamiento/anexo71Audiovisual/', dataAnexoPost, indice); habilitarNextButton()"
+                          class="miBtn btn btn-outline-dark" type="button">
+                        <i class="bi bi-arrow-bar-right"></i> Salvar
+                      </button>
+                      <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear
+                      </button>
+                    </div>
+                  </form>
+                  <hr>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th scope="col">Acciones</th>
+                        <th scope="col">Locacion</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">Tarifa</th>
+                        <th scope="col">Periocidad de Pago</th>
+                        <th scope="col">Periocidad de Entrega</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="(item, index) in anexo71AudiovisualAPI" :key="item.id">
+                        <td>
+                        <span class="sombra badge bg-primary" title="Modificar"
+                              @click="editarAnexo(`licenciamiento/anexo71Audiovisual/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                        </td>
+                        <td>{{ item.locacion }}</td>
+                        <td>{{ item.categoriaAudiovisual }}</td>
+                        <td>{{ item.tarifa }}</td>
+                        <td>{{ item.periocidadPago }}</td>
+                        <td>{{ item.periocidadEntrega }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center">
+                    <button class="miBtn btn btn-outline-dark" type="button"
+                            @click="actualizarAnexos71Audiovisual(dataAnexoPost.fk_contratoLicenciaEstatal)"><i
+                        class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+
+                <!--                MODIFICAR ANEXO CIMEX-->
+                <div class="modal-body" v-if="indicadorAnexo==3">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Anexo CIMEX</strong></h4>
+                    <p>Este contrato cuenta con anexos del tipo cimex, para modificar algun campo presione en la accion en la tabla.</p>
+                  </div>
+                  <form class="row g-3">
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"
+                                                        class="styleInput form-control"
+                                                        v-model="dataAnexoPost.locacionModalidad"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Locacion/Modalidad</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.cantidadPlazas"
+                                                        id="idCantPlazas"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Cantidad de Plazas</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="text" class="styleInput form-control"
+                                                        @input="calcularImporte" v-model="dataAnexoPost.tarifa"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" readonly class="styleInput form-control"
+                                                        v-model="dataAnexoPost.importe"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">Importe</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadPago">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadEntrega">
+                          <option value="">----------</option>
+                          <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        hidden readonly id="contratoAnexo72Cimex"
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div class="text-center">
+                      <button
+                          @click="POST_PUT('licenciamiento/anexo72Cimex/', dataAnexoPost, indice); habilitarNextButton()"
+                          class="miBtn btn btn-outline-dark" type="button">
+                        <i class="bi bi-arrow-bar-right"></i> Salvar
+                      </button>
+                      <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear
+                      </button>
+                    </div>
+                  </form>
+                  <hr>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th scope="col">Acciones</th>
+                        <th scope="col">Locacion/Modalidad</th>
+                        <th scope="col">Cantidad de plazas</th>
+                        <th scope="col">Tarifa</th>
+                        <th scope="col">Importe</th>
+                        <th scope="col">Periocidad de Pago</th>
+                        <th scope="col">Periocidad de Entrega</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="(item, index) in anexo72CimexAPI" :key="item.id">
+                        <td>
+                        <span class="sombra badge bg-primary" title="Modificar"
+                              @click="editarAnexo(`licenciamiento/anexo72Cimex/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                        </td>
+                        <td>{{ item.locacionModalidad }}</td>
+                        <td>{{ item.cantidadPlazas }}</td>
+                        <td>{{ item.tarifa }}</td>
+                        <td>{{ item.importe }}</td>
+                        <td>{{ item.periocidadPago }}</td>
+                        <td>{{ item.periocidadEntrega }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center">
+                    <button class="miBtn btn btn-outline-dark" type="button"
+                            @click="actualizarAnexos72Cimex(dataAnexoPost.fk_contratoLicenciaEstatal)"><i
+                        class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+
+                <!--                MODIFICAR ANEXO GAVIOTA-->
+                <div class="modal-body" v-if="indicadorAnexo==4">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Anexo Gaviota</strong></h4>
+                    <p>Este contrato cuenta con anexos del tipo gaviota, para modificar algun campo presione en la accion en la tabla.</p>
+                  </div>
+                  <form class="row g-3">
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.categoria" @click="asignarIdAlCampoContratoDelAnexo">
+                          <option value="">-----------</option>
+                          <option v-for="item in CHOICES[14].TIPO_CATEGORIA_HOTELES" :key="item.value"
+                                  :value="item.value">{{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Categoria</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.numeroHabitacion"
+                                                        id="numeroHabitaciones"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Numero de Habitaciones</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="text" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.periodo"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Periodo</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifaTemporadaAlta"
+                                                        id="floatingName" @input="calcularImporteTempAlta"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa Temp. Alta</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifaTemporadaBaja"
+                                                        id="floatingName" @input="calcularImporteTempBaja"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa Temp. Baja</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifaOcupacionInferior"
+                                                        id="floatingName" @input="calcularImporteInferior"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa Ocupacion inferior del 30%</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.importeTemporadaAlta"
+                                                        id="floatingName" readonly
+                                                        placeholder="Nombre"> <label for="floatingName">Importe Temp.
+                        Alta</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.importeTemporadaBaja"
+                                                        id="floatingName" readonly
+                                                        placeholder="Nombre"> <label for="floatingName">Importe Temp.
+                        Baja</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.importeTemporadaOcupacionInferior"
+                                                        id="floatingName" readonly
+                                                        placeholder="Nombre"> <label for="floatingName">Importe Ocupacion
+                        inferior del 30%</label></div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadPago">
+                          <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadEntrega">
+                          <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        hidden readonly id="contratoAnexo72Gaviota"
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div class="text-center">
+                      <button
+                          @click="POST_PUT('licenciamiento/anexo72Gaviota/', dataAnexoPost, indice); habilitarNextButton()"
+                          class="miBtn btn btn-outline-dark" type="button">
+                        <i class="bi bi-arrow-bar-right"></i> Salvar
+                      </button>
+                      <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear
+                      </button>
+                    </div>
+                  </form>
+                  <hr>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th scope="col">Acciones</th>
+                        <th scope="col">Categoria</th>
+                        <th scope="col">No. Habitaciones</th>
+                        <th scope="col">Periodo</th>
+                        <th scope="col">Tarifa Temp. Alta</th>
+                        <th scope="col">Tarifa temp. Baja</th>
+                        <th scope="col">Tarifa ocupacion inferior al 30%</th>
+                        <th scope="col">Importe Temp. Alta</th>
+                        <th scope="col">Importe temp. Baja</th>
+                        <th scope="col">Importe ocupacion inferior al 30%</th>
+                        <th scope="col">Periocidad de Pago</th>
+                        <th scope="col">Periocidad de Entrega</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="(item, index) in anexo72GaviotaAPI" :key="item.id">
+                        <td>
+                        <span class="sombra badge bg-primary" title="Modificar"
+                              @click="editarAnexo(`licenciamiento/anexo72Gaviota/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                        </td>
+                        <td>{{ item.categoria }}</td>
+                        <td>{{ item.numeroHabitacion }}</td>
+                        <td>{{ item.periodo }}</td>
+                        <td>{{ item.tarifaTemporadaAlta }}</td>
+                        <td>{{ item.tarifaTemporadaBaja }}</td>
+                        <td>{{ item.tarifaOcupacionInferior }}</td>
+                        <td>{{ item.importeTemporadaAlta }}</td>
+                        <td>{{ item.importeTemporadaBaja }}</td>
+                        <td>{{ item.importeTemporadaOcupacionInferior }}</td>
+                        <td>{{ item.periocidadPago }}</td>
+                        <td>{{ item.periocidadEntrega }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center">
+                    <button class="miBtn btn btn-outline-dark" type="button"
+                            @click="actualizarAnexos72Gaviota(dataAnexoPost.fk_contratoLicenciaEstatal)"><i
+                        class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+
+                <!--                MODIFICAR ANEXO TRD-->
+                <div class="modal-body" v-if="indicadorAnexo==5">
+                  <div class="alert alert-info alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Anexo Tiendas Caribe</strong></h4>
+                    <p>Este contrato cuenta con anexos del tipo tiendas caribe, para modificar algun campo presione en la accion en la tabla.</p>
+                  </div>
+                  <form class="row g-3">
+                    <div class="col-md-6">
+                      <div class="form-floating"><input type="text" @click="asignarIdAlCampoContratoDelAnexo"
+                                                        class="styleInput form-control" v-model="dataAnexoPost.locacion"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Locacion</label></div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.modalidad">
+                          <option value="">-----------</option>
+                          <option v-for="item in modalidadAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Modalidad</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.tarifa"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">
+                        <span class="text-danger">* </span>Tarifa</label></div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        v-model="dataAnexoPost.importe"
+                                                        id="floatingName"
+                                                        placeholder="Nombre"> <label for="floatingName">Importe</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadPago">
+                          <option value="">-----------</option>
+                          <option v-for="item in CHOICES[8].PERIOCIDAD_PAGO" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de pago</label>
+                      </div>
+                    </div>
+                    <div class="col-md-3">
+                      <div class="form-floating mb-3">
+                        <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"
+                                v-model="dataAnexoPost.periocidadEntrega">
+                          <option value="">-----------</option>
+                          <option v-for="item in CHOICES[9].PERIOCIDAD_ENTREGA" :key="item.value" :value="item.value">
+                            {{ item.descripcion }}
+                          </option>
+                        </select>
+                        <label for="floatingSelect"><span class="text-danger">* </span>Periocidad de entrega</label>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                        hidden readonly id="contratoAnexo72Trd"
+                                                        v-model="dataAnexoPost.fk_contratoLicenciaEstatal"
+                                                        placeholder="Nombre"></div>
+                    </div>
+                    <div class="text-center">
+                      <button
+                          @click="POST_PUT('licenciamiento/anexo72Trd/', dataAnexoPost, indice); habilitarNextButton()"
+                          class="miBtn btn btn-outline-dark" type="button">
+                        <i class="bi bi-arrow-bar-right"></i> Salvar
+                      </button>
+                      <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear
+                      </button>
+                    </div>
+                  </form>
+                  <hr>
+                  <div class="table-responsive">
+                    <table class="table table-striped">
+                      <thead>
+                      <tr>
+                        <th scope="col">Acciones</th>
+                        <th scope="col">Locacion</th>
+                        <th scope="col">Modalidad</th>
+                        <th scope="col">Tarifa</th>
+                        <th scope="col">Importe</th>
+                        <th scope="col">Periocidad de Pago</th>
+                        <th scope="col">Periocidad de Entrega</th>
+                      </tr>
+                      </thead>
+                      <tbody>
+                      <tr v-for="(item, index) in anexo72TrdAPI" :key="item.id">
+                        <td>
+                        <span class="sombra badge bg-primary" title="Modificar"
+                              @click="editarAnexo(`licenciamiento/anexo72Trd/${item.id}/`, index)"><i
+                            class="bi bi-pencil"></i></span>
+                        </td>
+                        <td>{{ item.locacion }}</td>
+                        <td>{{ item.modalidad }}</td>
+                        <td>{{ item.tarifa }}</td>
+                        <td>{{ item.importe }}</td>
+                        <td>{{ item.periocidadPago }}</td>
+                        <td>{{ item.periocidadEntrega }}</td>
+                      </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <div class="text-center">
+                    <button class="miBtn btn btn-outline-dark" type="button"
+                            @click="actualizarAnexos72Trd(dataAnexoPost.fk_contratoLicenciaEstatal)"><i
+                        class="bi bi-arrow-repeat"></i> Actualizar
+                    </button>
+                  </div>
+                </div>
+
+                <!--                SIN ANEXO-->
+                <div class="modal-body" v-if="indicadorAnexo==6">
+                  <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Sin Anexos</strong></h4>
+                    <p>Este contrato no cuenta con ningun tipo de anexo.</p>
+                  </div>
+                </div>
+
                 <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                 </div>

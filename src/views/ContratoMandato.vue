@@ -66,8 +66,10 @@ onMounted(() => {
                       <span class="badge bg-primary rounded-pill">{{ item.fechaCreacion }}</span></li>
                     <li class="list-group-item d-flex justify-content-between align-items-center"> Actividad
                       <span class="badge bg-primary rounded-pill">{{ item.tipoActividad }}</span></li>
-                    <li class="list-group-item d-flex justify-content-between align-items-center"> Porcentaje de remuneracion
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Remuneracion estatal
                       <span class="badge bg-primary rounded-pill">{{ item.remuneracion }}%</span></li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center"> Remuneracion no estatal
+                      <span class="badge bg-primary rounded-pill">{{ item.remuneracionNoEstatal }}%</span></li>
                   </ul>
                 </div>
                 <div class="modal-footer">

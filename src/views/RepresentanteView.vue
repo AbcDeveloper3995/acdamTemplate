@@ -57,6 +57,7 @@ const contratoMandatoPost = ref({
   numeroLicencia:null,
   numeroContrato:null,
   remuneracion:null,
+  remuneracionNoEstatal:null,
 })
 const lastContrato = ref({
   pk:'',
@@ -152,7 +153,7 @@ const onChangeCurrentTab = (index, oldIndex) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
                                    <h3><strong>DE OTRA PARTE:</strong> La ${response.data.fk_representante} cubano(a), con numero de identidad permanente ${response.data.ci} con domicilio particular en ${response.data.direccion}, municipio ${response.data.municipioResidente}, en la provincia ${response.data.provincia}, con autorización para el ejercicio del trabajo por cuenta propia en la actividad ${response.data.tipoActividad}, segun la Licencia No. ${response.data.numeroLicencia}, expedida en la fecha ${response.data.fechaLicencia}, por la Oficina de Tramites del municipio ${response.data.municipioResidente}, provincia de ${response.data.provincia}, inscrito en el registro de Contribuyentes de la ONAT en fecha ${response.data.fechaInscripcion}, que en lo adelante se denominará, a efectos de este contrato, <strong>REPRESENTANTE</strong>.</h3>
                                    <h3>${response.data.descripcion}</h3>
-                                   <h3>3.1.- La ACDAM pagará al REPRESENTANTE al cierre de cada mes, mediante cheque o transferencia por tarjeta magnética, una remuneración ascendente al ${response.data.remuneracion}% de su recaudación bruta mensual estatal y 200% de recaudacion bruta del no estatal. </h3>
+                                   <h3>3.1.- La ACDAM pagará al REPRESENTANTE al cierre de cada mes, mediante cheque o transferencia por tarjeta magnética, una remuneración ascendente al ${response.data.remuneracion}% de su recaudación bruta mensual estatal y ${response.data.remuneracionNoEstatal}% de recaudacion bruta del no estatal. </h3>
                                    <h3>${response.data.descripcion2daParte}</h3>
                                    <h3>Y como prueba de conformidad con todo lo anterior, las partes firman el presente contrato, que se emite por duplicado, a un sólo tenor y efectos legales, en La Habana a los ${dia} días del mes de ${mes} de ${ano}.</h3>`
           lastContrato.value.pk = response.data.id
@@ -485,6 +486,11 @@ onMounted(() => {
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.remuneracion"
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Remuneracion (%)</label></div>
+                  </div>
+                  <div class="col-md-4">
+                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.remuneracionNoEstatal"
+                                                      id="floatingName"
+                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Remuneracion no estatal (%)</label></div>
                   </div>
                   <div class="col-md-4">
                     <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
