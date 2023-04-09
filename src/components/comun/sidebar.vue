@@ -7,6 +7,7 @@ import {RouterLink} from 'vue-router'
       <span class="nav-heading text-black" style="font-size: 15px">Nomencladores</span>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-bookmark"></i><RouterLink to="/cargo">Cargos</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-people"></i><RouterLink to="/concepto">Conceptos</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-hammer"></i><RouterLink to="/sucursal">Sucursal</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-device-ssd"></i><RouterLink to="/modalidad">Modalidad</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-grid"></i><RouterLink to="/sector">Sector</RouterLink></a></li>
       <span class="nav-heading text-black" style="font-size: 15px">Licenciamiento</span>
@@ -15,7 +16,8 @@ import {RouterLink} from 'vue-router'
       <li class="nav-item"><a class="nav-link "><i class="bi bi-window-x"></i><RouterLink to="/contratoMandato">Contrato Mandato</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-usb-symbol"></i><RouterLink to="/contratoLicencia">Contrato de licencia</RouterLink></a></li>
       <span class="nav-heading text-black" style="font-size: 15px">Recaudacion</span>
-      <li class="nav-item"><a class="nav-link "><i class="bi bi-thunderbolt-fill"></i><RouterLink to="/recaudacion">Recaudacion</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-thunderbolt"></i><RouterLink to="/recaudacion">Recaudacion</RouterLink></a></li>
+      <li class="nav-item"><a class="nav-link "><i class="bi bi-journal-bookmark"></i><RouterLink to="/credito">Creditos</RouterLink></a></li>
       <li class="nav-item"><a class="nav-link "><i class="bi bi-terminal-x"></i><RouterLink to="/reporteCobro">Reporte de cobro</RouterLink></a></li>
 <!--      <span class="nav-heading text-black" style="font-size: 15px">Juridico</span>-->
 <!--      <li class="nav-item"><a class="nav-link "><i class="bi bi-send-exclamation-1"></i><RouterLink to="/reclamaciones">Reclamaciones</RouterLink></a></li>-->

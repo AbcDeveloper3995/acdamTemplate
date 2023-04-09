@@ -78,9 +78,21 @@ const router = createRouter({
       meta: {requiresAuth:true}
     },
     {
+      path: '/sucursal',
+      name: 'sucursal',
+      component: () => import('../views/SucursalView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
       path: '/recaudacion',
       name: 'recaudacion',
       component: () => import('../views/RecaudacionView.vue'),
+      meta: {requiresAuth:true}
+    },
+    {
+      path: '/credito',
+      name: 'credito',
+      component: () => import('../views/CreditoView.vue'),
       meta: {requiresAuth:true}
     },
     {
