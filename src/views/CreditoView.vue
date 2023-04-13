@@ -104,6 +104,20 @@ const isActive = (pagina) => {
 return pagina == paginaActual ? 'active' : ''
 }
 
+//FUNCION PARA OBTENER LA PROVINCIA Y MUNICIPIO SEGUN LA SUCURSAL SELECCIONADA A ASIGNARLOS A LOS CAMPOS CORRESPONDIENTE
+const getProvinciaYmunicipio = (event) => {
+  let slug = event.target.value
+  let url = `recaudacion/sucursal/${slug}/`
+  axios.get(url)
+      .then((response) => {
+        dataPost.value.provincia = response.data.data.provincia
+        dataPost.value.municipio = response.data.data.fk_municipio
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
+
 onMounted(() => {
   getCreditoPaginados()
   GET("recaudacion/recaudacion/", recaudacionAPI)
@@ -148,7 +162,7 @@ onMounted(() => {
                 </div>
                 <div class="col-md-4">
                   <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Sucursal</label>
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_sucursal">
+                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="getProvinciaYmunicipio" v-model="dataPost.fk_sucursal">
                     <option v-for="item in sucursalAPI" :key="item.id" :value="item.id">{{ item.codigo }}
                     </option>
                   </select>
@@ -247,7 +261,7 @@ onMounted(() => {
                   <tr>
                     <th scope="col">Acciones</th>
                     <th scope="col">Utilizador</th>
-                    <th scope="col">sucursal</th>
+                    <th scope="col">Sucursal</th>
                     <th scope="col">Provincia</th>
                     <th scope="col">Municipio</th>
                     <th scope="col">Transferencia</th>

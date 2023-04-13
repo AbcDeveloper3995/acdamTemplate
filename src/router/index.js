@@ -98,7 +98,7 @@ const router = createRouter({
     {
       path: '/reporteCobro',
       name: 'reporteCobro',
-      component: () => import('../views/ReportesView.vue'),
+      component: () => import('../views/ReporteCobroView.vue'),
       meta: {requiresAuth:true}
     },
     {
