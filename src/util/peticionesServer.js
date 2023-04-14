@@ -39,9 +39,8 @@ const POST_PUT = async (url, dataPost, indice) => {
             mensaje('error','Error', "Ha ocurrido un error interno en el servidor.")
         }
     }
-
-
 }
+
 const GET = async (url, lista) => {
     try {
         let response = await axios.get(url)

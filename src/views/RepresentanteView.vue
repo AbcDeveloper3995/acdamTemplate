@@ -51,8 +51,8 @@ const contratoMandatoPost = ref({
   fk_representante:'',
   fk_utilizador:'',
   fk_representantesAsociados:[],
-  fechaLicencia:'',
-  fechaInscripcion:'',
+  fechaLicencia:null,
+  fechaInscripcion:null,
   tipoActividad:'',
   numeroLicencia:null,
   numeroContrato:null,
@@ -63,6 +63,10 @@ const lastContrato = ref({
   pk:'',
   titulo:'',
   numeroContrato:'',
+  provincia:'',
+  fk_municipiosAtendidos:[],
+  fk_utilizador:[],
+  fk_sector:[],
 })
 const contratoFormato = ref('')
 const indiceNextButton = ref(true)
@@ -151,7 +155,7 @@ const onChangeCurrentTab = (index, oldIndex) => {
     axios.get(url)
         .then((response) => {
           contratoFormato.value = `<h3>${response.data.encabezado}</h3>
-                                   <h3><strong>DE OTRA PARTE:</strong> La ${response.data.fk_representante} cubano(a), con numero de identidad permanente ${response.data.ci} con domicilio particular en ${response.data.direccion}, municipio ${response.data.municipioResidente}, en la provincia ${response.data.provincia}, con autorización para el ejercicio del trabajo por cuenta propia en la actividad ${response.data.tipoActividad}, segun la Licencia No. ${response.data.numeroLicencia}, expedida en la fecha ${response.data.fechaLicencia}, por la Oficina de Tramites del municipio ${response.data.municipioResidente}, provincia de ${response.data.provincia}, inscrito en el registro de Contribuyentes de la ONAT en fecha ${response.data.fechaInscripcion}, que en lo adelante se denominará, a efectos de este contrato, <strong>REPRESENTANTE</strong>.</h3>
+                                   <h3><strong>DE OTRA PARTE:</strong> La ${response.data.fk_representante} cubano(a), con numero de identidad permanente ${response.data.ci} con domicilio particular en ${response.data.direccion}, municipio ${response.data.municipioResidente}, en la provincia ${response.data.provincia}, con autorización para el ejercicio del trabajo por cuenta propia en la actividad ${response.data.tipoActividad}, segun la Licencia No. _____________, expedida en la fecha _______________, por la Oficina de Tramites del municipio ${response.data.municipioResidente}, provincia de ${response.data.provincia}, inscrito en el registro de Contribuyentes de la ONAT en fecha ________________, que en lo adelante se denominará, a efectos de este contrato, <strong>REPRESENTANTE</strong>.</h3>
                                    <h3>${response.data.descripcion}</h3>
                                    <h3>3.1.- La ACDAM pagará al REPRESENTANTE al cierre de cada mes, mediante cheque o transferencia por tarjeta magnética, una remuneración ascendente al ${response.data.remuneracion}% de su recaudación bruta mensual estatal y ${response.data.remuneracionNoEstatal}% de recaudacion bruta del no estatal. </h3>
                                    <h3>${response.data.descripcion2daParte}</h3>
@@ -159,6 +163,10 @@ const onChangeCurrentTab = (index, oldIndex) => {
           lastContrato.value.pk = response.data.id
           lastContrato.value.titulo = response.data.titulo
           lastContrato.value.numeroContrato = response.data.numeroContrato
+          lastContrato.value.provincia = response.data.provincia
+          lastContrato.value.fk_municipiosAtendidos = response.data.fk_municipiosAtendidos
+          lastContrato.value.fk_utilizador = response.data.fk_utilizador
+          lastContrato.value.fk_sector = response.data.fk_sector
         })
         .catch((error) => {
           mensaje('error','Error', error)
@@ -322,7 +330,7 @@ onMounted(() => {
                   </div>
                 </div>
                 <div class="col-md-4">
-                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.codigo" required
+                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.codigo" required
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Codigo</label></div>
                 </div>
@@ -442,6 +450,9 @@ onMounted(() => {
                                   {
                                     title: 'Formatear y Exportar',
                                   },
+                                  {
+                                    title: 'Anexo',
+                                  },
                                 ]"
               :beforeChange="onTabBeforeChange"
               @change="onChangeCurrentTab"
@@ -467,21 +478,21 @@ onMounted(() => {
                       <label for="floatingSelect"><span class="text-danger">* </span>Tipo Actividad</label>
                     </div>
                   </div>
-                  <div class="col-md-4">
-                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.numeroLicencia"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>No. Licencia</label></div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaLicencia"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Licencia</label><br></div>
-                  </div>
-                  <div class="col-md-4">
-                    <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaInscripcion"
-                                                      id="floatingName"
-                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Inscripcion</label></div>
-                  </div>
+<!--                  <div class="col-md-4">-->
+<!--                    <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.numeroLicencia"-->
+<!--                                                      id="floatingName"-->
+<!--                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>No. Licencia</label></div>-->
+<!--                  </div>-->
+<!--                  <div class="col-md-4">-->
+<!--                    <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaLicencia"-->
+<!--                                                      id="floatingName"-->
+<!--                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Licencia</label><br></div>-->
+<!--                  </div>-->
+<!--                  <div class="col-md-4">-->
+<!--                    <div class="form-floating"><input type="date" class="styleInput form-control" v-model="contratoMandatoPost.fechaInscripcion"-->
+<!--                                                      id="floatingName"-->
+<!--                                                      placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Fecha Inscripcion</label></div>-->
+<!--                  </div>-->
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control" v-model="contratoMandatoPost.remuneracion"
                                                       id="floatingName"
@@ -492,13 +503,13 @@ onMounted(() => {
                                                       id="floatingName"
                                                       placeholder="Nombre"> <label for="floatingName"><span class="text-danger">* </span>Remuneracion no estatal (%)</label></div>
                   </div>
-                  <div class="col-md-4">
-                    <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>
-                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>
-                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                      </option>
-                    </select>
-                  </div>
+<!--                  <div class="col-md-4">-->
+<!--                    <label for="inputState" class="form-label" style="margin-left: 15px">Asociados</label>-->
+<!--                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="dataPost.fk_representantesAsociados" multiple>-->
+<!--                      <option v-for="item in representanteAPI" :key="item.id" :value="item.id">{{ item.nombre }}-->
+<!--                      </option>-->
+<!--                    </select>-->
+<!--                  </div>-->
 
                   <div class="col-md-4">
                     <div class="form-floating"><input type="number" class="styleInput form-control"  readonly hidden
@@ -559,6 +570,60 @@ onMounted(() => {
               </div>
             </div>
 
+            <!--            PROCESO PARA EL PASO 3-->
+            <div class="row" v-if="currentTabIndex === 2">
+              <section :id="lastContrato.titulo">
+                <!--                PDF A GENRAR SI ES ESTATAL-->
+                <div>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="text-center" ><strong>ANEXOS No.1 DEL {{lastContrato.titulo}} No.{{lastContrato.numeroContrato}}/{{ ano }}</strong></h5>
+                    <img src="../assets/img/acdamlogo.jpg">
+                  </div>
+                  <br>
+                  <h5><strong>AMBITO DE COMPETENCIA DEL REPRESENTANTE</strong></h5>
+                  <h5><strong>PROVINCIA:</strong> {{lastContrato.provincia}}</h5>
+                  <br>
+                  <br>
+                  <h5><strong>UTILIZADORES QUE ATIENDE:</strong></h5>
+                  <ul>
+                    <li v-for="i in lastContrato.fk_municipiosAtendidos">{{ i.nombre }}</li>
+                  </ul>
+                  <br>
+                  <br>
+                  <h5><strong>MUNICIPIOS:</strong></h5>
+                  <ul>
+                    <li v-for="i in lastContrato.fk_utilizador">{{ i.nombre }}</li>
+                  </ul>
+                  <br>
+                  <br>
+                  <h5><strong>SECTORES:</strong></h5>
+                  <ul>
+                    <li v-for="i in lastContrato.fk_sector">{{ i.nombre }}</li>
+                  </ul>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <br>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <p>POR LA ACDAM:</p>
+                    <p>EL REPRESENTANTE:</p>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <p>_______________________ </p>
+                    <p>_______________________ </p>
+                  </div>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <p>Director René Hernández Quintero </p>
+                    <p></p>
+                  </div>
+                </div>
+              </section>
+              <div class="text-center">
+                <button @click="PDF(`${lastContrato.titulo}`)" class="miBtn btn btn-outline-light" type="button">
+                  <i class="bi bi-file-earmark-pdf"></i> Generar PDF</button>
+              </div>
+            </div>
           </Wizard>
         </div>
       </div>
