@@ -150,7 +150,7 @@ onMounted(() => {
                     </div>
 
                     <div class="col-md-4">
-                      <div class="form-floating"><input type="number" class="styleInput form-control" readonly
+                      <div class="form-floating"><input type="number" class="styleInput form-control" readonly hidden
                                                         id="floatingName" v-model="contratoMandatoPost.pk"
                                                         placeholder="Nombre"></div>
                     </div>

@@ -204,8 +204,8 @@ onMounted(() => {
                     <td>{{ item.fechaCreacion }}</td>
                     <td>{{ item.fechaEstadoCuenta }}</td>
                     <td>{{ item.numeroEstadoCuenta }}</td>
-                    <td>{{ item.saldoAnterior }}</td>
-                    <td>{{ item.saldoCierre }}</td>
+                    <td> <span class="badge bg-primary"><i class="bi bi-currency-dollar"> {{ item.saldoAnterior }}</i></span></td>
+                    <td> <span class="badge bg-primary"><i class="bi bi-currency-dollar"> {{ item.saldoCierre }}</i></span></td>
                   </tr>
                   </tbody>
                 </table>
