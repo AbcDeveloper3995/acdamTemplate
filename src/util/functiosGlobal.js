@@ -19,4 +19,12 @@ const PDF = (idElemento) => {
     html2pdf().from(content).set(options).save();
 }
 
-export {dia, mes, ano, PDF}
+//FUNCION PARA GENERAR EL CODIGO DEL PLAN MENSUAL (SIEMPRE SERA EL MES ACTUAL SEGUIDO DEL AÑO; 42023)
+const generarCodigo = () => {
+    let fecha= new Date()
+    let mes = fecha.getMonth() + 1
+    let codigo = mes.toString()+fecha.getFullYear().toString()
+    return parseInt(codigo)
+}
+
+export {dia, mes, ano, PDF, generarCodigo}

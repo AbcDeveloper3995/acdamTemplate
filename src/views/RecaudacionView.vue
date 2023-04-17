@@ -8,6 +8,7 @@ import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
+import {generarCodigo} from '../util/functiosGlobal'
 
 //DECLARACIONES
 const router =useRouter()
@@ -21,6 +22,14 @@ const dataPost = ref({
   numeroEstadoCuenta: '',
   saldoAnterior: '',
   saldoCierre: '',
+})
+
+const planMensualPost = ref({
+  pk: '',
+  planFronteraEstatal: 0,
+  planFronteraTCP: 0,
+  planSociedad: 0,
+  codigo: generarCodigo(),
 })
 
 let loading = ref(false)
@@ -105,7 +114,55 @@ onMounted(() => {
       </nav>
     </div>
     <section class="section dashboard">
-      <!--      RENDERIZADO DEL FORMULARIO-->
+      <!--      RENDERIZADO DEL FORMULARIO PLAN MENSUAL-->
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card glassmorphism">
+            <ul class="sidebar-nav p-2" id="cardPlan">
+              <a class="nav-link collapsed" style="background: None" data-bs-target="#plan"
+                 data-bs-toggle="collapse" href="#"
+                 aria-expanded="false"> <i class="bi-plus-circle"></i>
+                <strong>Establecer Plan Mensual</strong><i
+                    class="bi bi-chevron-down ms-auto"></i>  </a>
+
+            </ul>
+            <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="plan"
+                 data-bs-parent="#cardFormulario">
+              <form class="row g-3">
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="planMensualPost.planFronteraEstatal"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"> <label for="floatingName">
+                    <span class="text-danger">* </span>En Frontera Estatal</label><br></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="planMensualPost.planFronteraTCP"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"> <label for="floatingName">
+                    <span class="text-danger">* </span>En Frontera TCP</label></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="planMensualPost.planSociedad"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"> <label for="floatingName">
+                    <span class="text-danger">* </span>En Sociedad</label></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="planMensualPost.codigo"
+                                                    id="floatingName" hidden
+                                                    placeholder="Nombre"></div>
+                </div>
+                <div class="text-center">
+                  <button @click="POST_PUT('recaudacion/recaudacionMensual/', planMensualPost, -1)"  class="miBtn btn btn-outline-light" type="button">
+                    <i class="bi bi-arrow-bar-right"></i> Salvar</button>
+                  <button type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--      RENDERIZADO DEL FORMULARIO RECAUDACION-->
       <div class="row">
         <div class="col-lg-12">
           <div class="card glassmorphism">

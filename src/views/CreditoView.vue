@@ -9,6 +9,7 @@ import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
 import CHOICES from '../util/choicesDeRecaudacion'
+import {generarCodigo} from '../util/functiosGlobal'
 
 //DECLARACIONES
 const router =useRouter()
@@ -45,6 +46,21 @@ const dataRecaudacionPost = ref({
   totalSociedades:0,
   totalGeneral:0,
 })
+const planMensualPost = ref({
+  planFronteraEstatal: 0,
+  planFronteraTCP: 0,
+  planSociedad: 0,
+  realFronteraEstatal: 0,
+  realFronteraTCP: 0,
+  realSociedad: 0,
+  devolucion: 0,
+})
+const porcentajeMesEstatal = ref(0)
+const porcentajeMesTCP = ref(0)
+const porcentajeMesSociedad = ref(0)
+const porcentajeTotal = ref(0)
+const totalEnPlan = ref(0)
+const totalEnReal = ref(0)
 let loading = ref(false)
 let buscar = ref("");
 let totalPaginas = 0
@@ -185,6 +201,96 @@ function calcularTotales(){
 const pintarImporteConDecimal = (item) => parseFloat(item).toFixed(2)
 const getRecaudacionResumen = () => GET("recaudacion/resumenRecaudacion/", resumenRecaudacionAPI)
 
+//FUNCION PARA OBTENER EL PLAN DEL MES, EL REAL RECAUDADO Y EL % QUE REPRESENTA LO REAL DEL PLAN
+const getPlanMes = () => {
+  let metropolitanoEstatal = document.getElementById('generalMetropolitanoEstatal')
+  let bifEstatal = document.getElementById('generalBfiEstatal')
+  let metropolitanoNoEstatal = document.getElementById('generalMetropolitanoNoEstatal')
+  let bifNoEstatal = document.getElementById('generalBfiNoEstatal')
+  let sociedad = document.getElementById('generalSociedad')
+  planMensualPost.value.realFronteraEstatal = parseFloat(metropolitanoEstatal.textContent)+parseFloat(bifEstatal.textContent)
+  planMensualPost.value.realFronteraEstatal = Math.round(planMensualPost.value.realFronteraEstatal*100)/100
+  planMensualPost.value.realFronteraTCP = parseFloat(metropolitanoNoEstatal.textContent)+parseFloat(bifNoEstatal.textContent)
+  planMensualPost.value.realFronteraTCP = Math.round(planMensualPost.value.realFronteraTCP*100)/100
+  planMensualPost.value.realSociedad = parseFloat(sociedad.textContent)
+  planMensualPost.value.realSociedad = Math.round(planMensualPost.value.realSociedad*100)/100
+
+  let url = `recaudacion/recaudacionMensual/${generarCodigo()}/getPlan/`
+  axios.get(url)
+      .then((response) => {
+        planMensualPost.value.planFronteraEstatal = response.data.planFronteraEstatal
+        planMensualPost.value.planFronteraTCP = response.data.planFronteraTCP
+        planMensualPost.value.planSociedad = response.data.planSociedad
+        planMensualPost.value.devolucion = response.data.devolucion
+        porcentajeMesEstatal.value = planMensualPost.value.realFronteraEstatal*100/response.data.planFronteraEstatal
+        porcentajeMesEstatal.value = Math.round(porcentajeMesEstatal.value*100)/100
+        porcentajeMesTCP.value = planMensualPost.value.realFronteraTCP*100/response.data.planFronteraTCP
+        porcentajeMesTCP.value = Math.round(porcentajeMesTCP.value*100)/100
+        porcentajeMesSociedad.value = planMensualPost.value.realSociedad*100/response.data.planSociedad
+        porcentajeMesSociedad.value = Math.round(porcentajeMesSociedad.value*100)/100
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
+
+//FUNCION PARA CALCULAR EL TOTAL POR CADA BANCO
+const calcularTotalPorBanco = (lista, indicador) =>{
+  let suma = 0
+  lista.forEach((item) => {
+    indicador==1?suma += item.totalMetropolitanoEstatal:''
+    indicador==2?suma += item.totalMetropolitanoNoEstatal:''
+    indicador==3?suma += item.totalBfiEstatal:''
+    indicador==4?suma += item.totalBfiNoEstatal:''
+    indicador==5?suma += item.totalSociedades:''
+    indicador==6?suma += item.totalGeneral:''
+  })
+  suma = Math.round(suma*100)/100
+  return suma
+}
+
+//FUNCION PARA IR SALVANDO EL VALOR DE LO REAL REACUADADO EN EL MES
+const salvarRecaudacionReal = () => {
+  let realFronteraEstatal = document.getElementById('realFronteraEstatal').textContent.replace('.', ',')
+  let realFronteraTCP = document.getElementById('realFronteraTCP').textContent.replace('.', ',')
+  let realSociedad = document.getElementById('realSociedad').textContent.replace('.', ',')
+  let real = JSON.stringify({
+    codigo:generarCodigo(),
+    realFronteraEstatal:realFronteraEstatal,
+    realFronteraTCP:realFronteraTCP,
+    realSociedad:realSociedad
+  })
+  let url = `recaudacion/recaudacionMensual/${real}/actualizarReal/`
+  axios.get(url)
+      .then((response) => {
+        mensaje('success','Exito', response.data.message)
+      })
+      .catch((error) => {
+        mensaje('error', 'Error', error.response.data.error)
+      })
+}
+
+//FUNCION PARA CALCULAR EL TOTAL EN PLAN
+const calcularTotalEnPlan = () => {
+  totalEnPlan.value = planMensualPost.value.planFronteraEstatal+planMensualPost.value.planFronteraTCP+planMensualPost.value.planSociedad
+  totalEnPlan.value = Math.round(totalEnPlan.value*100)/100
+  return totalEnPlan.value
+}
+
+//FUNCION PARA CALCULAR EL TOTAL EN REAL
+const calcularTotalEnReal = () => {
+  totalEnReal.value = planMensualPost.value.realFronteraEstatal+planMensualPost.value.realFronteraTCP+planMensualPost.value.realSociedad
+  totalEnReal.value = Math.round(totalEnReal.value*100)/100
+  return totalEnReal.value
+}
+
+//FUNCION PARA CALCULAR EL PORCENTAJE TOTAL
+const calcularPorcentajeTotal = () => {
+  porcentajeTotal.value = totalEnReal.value*100/totalEnPlan.value
+  porcentajeTotal.value = Math.round(porcentajeTotal.value*100)/100
+  return porcentajeTotal.value
+}
+
 onMounted(() => {
   getCreditoPaginados()
   getRecaudacionActual()
@@ -321,6 +427,10 @@ onMounted(() => {
           <div class="card glassmorphism">
             <div class="card-body">
               <h5 class="card-title"><i class="bi bi-layout-text-window-reverse"></i><strong> Listado de Creditos</strong></h5>
+              <div v-if="creditoAPI.length==0" class="alert alert-info alert-dismissible fade show" role="alert">
+                <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Informacion</strong></h4>
+                <p>Aun no se han registrado ningun ingreso de credito correspondiente al dia de hoy.</p>
+              </div>
               <div class="row">
                 <div class="col-sm-2">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="buscar"
@@ -396,13 +506,13 @@ onMounted(() => {
             <li class="nav-item flex-fill" role="presentation">
               <button class="nav-link w-100 active" id="home-tab" data-bs-toggle="tab"
                       data-bs-target="#bordered-justified-home" type="button" role="tab" aria-controls="home"
-                      aria-selected="true">Ingresos</button></li>
+                      aria-selected="true">Ingresos del dia</button></li>
             <li class="nav-item flex-fill" role="presentation">
               <button class="nav-link w-100" @click="getRecaudacionResumen" id="profile-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-profile"
-                      type="button" role="tab" aria-controls="profile" aria-selected="false">Tabla Resumen</button></li>
+                      type="button" role="tab" aria-controls="profile" aria-selected="false">Tabla de ingresos diarios</button></li>
             <li class="nav-item flex-fill" role="presentation">
-              <button class="nav-link w-100" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact"
-                      type="button" role="tab" aria-controls="contact" aria-selected="false">Plan</button></li>
+              <button class="nav-link w-100" @click="getPlanMes" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact"
+                      type="button" role="tab" aria-controls="contact" aria-selected="false">Plan del Mes</button></li>
           </ul>
           <div class="tab-content pt-2" id="borderedTabJustifiedContent">
             <div class="tab-pane fade show active" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
@@ -468,24 +578,19 @@ onMounted(() => {
               <table class="table table-striped">
                 <thead>
                 <tr>
-                  <th scope="col">Acciones</th>
-                  <th scope="col">Total Banco Metropolitano Estatal</th>
-                  <th scope="col">Total Banco Metropolitano No Estatal</th>
-                  <th scope="col">Total BFI Estatal</th>
-                  <th scope="col">Total BFI No Estatal</th>
-                  <th scope="col">Total Sociedades</th>
+                  <th scope="col">Dia</th>
+                  <th scope="col">Banco Metropolitano Estatal</th>
+                  <th scope="col">Banco Metropolitano No Estatal</th>
+                  <th scope="col">BFI Estatal</th>
+                  <th scope="col">BFI No Estatal</th>
+                  <th scope="col">Sociedades</th>
                   <th scope="col">Total Recaudado en el dia</th>
                 </tr>
                 </thead>
                 <tbody>
                 <div v-if="loading"><span class="loader"></span></div>
                 <tr v-for="(item, index) in resumenRecaudacionAPI" :key="item.id">
-                  <td>
-                        <span class="sombra badge bg-primary" @click="editarCredito(item, index)" title="Modificar"><i
-                            class="bi bi-pencil"></i></span>
-                    <span class="sombra badge bg-danger m-lg-1" @click="DELETE('recaudacion/credito/'+item.id)"
-                          title="Eliminar"><i class="bi bi-trash"></i></span>
-                  </td>
+                  <td>{{ item.fechaCreacion }}</td>
                   <td>{{ item.totalMetropolitanoEstatal }}</td>
                   <td>{{ item.totalMetropolitanoNoEstatal }}</td>
                   <td>{{ item.totalBfiEstatal }}</td>
@@ -493,10 +598,77 @@ onMounted(() => {
                   <td>{{ item.totalSociedades }}</td>
                   <td>{{ item.totalGeneral }}</td>
                 </tr>
+                <tr>
+                  <td><strong>TOTAL</strong></td>
+                  <td id="generalMetropolitanoEstatal">{{calcularTotalPorBanco(resumenRecaudacionAPI,1)}}</td>
+                  <td id="generalMetropolitanoNoEstatal">{{calcularTotalPorBanco(resumenRecaudacionAPI,2)}}</td>
+                  <td id="generalBfiEstatal">{{calcularTotalPorBanco(resumenRecaudacionAPI,3)}}</td>
+                  <td id="generalBfiNoEstatal">{{calcularTotalPorBanco(resumenRecaudacionAPI,4)}}</td>
+                  <td id="generalSociedad">{{calcularTotalPorBanco(resumenRecaudacionAPI,5)}}</td>
+                  <td>{{calcularTotalPorBanco(resumenRecaudacionAPI,6)}}</td>
+                </tr>
                 </tbody>
               </table>
             </div>
-            <div class="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab"> Saepe animi et soluta ad odit soluta sunt. Nihil quos omnis animi debitis cumque. Accusantium quibusdam perspiciatis qui qui omnis magnam. Officiis accusamus impedit molestias nostrum veniam. Qui amet ipsum iure. Dignissimos fuga tempore dolor.</div>
+            <div class="tab-pane fade" id="bordered-justified-contact" role="tabpanel" aria-labelledby="contact-tab">
+              <button @click="salvarRecaudacionReal"  class="miBtn btn btn-outline-light" type="button">
+                <i class="bi bi-safe"></i> Salvar monto real</button>
+              <hr>
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col" style="width: 25%">Caracteristica</th>
+                  <th scope="col" style="width: 25%">Plan</th>
+                  <th scope="col" style="width: 15%">Real</th>
+                  <th scope="col" class="text-center">%</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <th scope="row">En Frontera Estatal</th>
+                  <td>{{pintarImporteConDecimal(planMensualPost.planFronteraEstatal)}}</td>
+                  <td id="realFronteraEstatal">{{pintarImporteConDecimal(planMensualPost.realFronteraEstatal)}}</td>
+                  <td><div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                       role="progressbar" :style="{width: `${porcentajeMesEstatal}%`}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{porcentajeMesEstatal}}%</div>
+                  </div></td>
+                </tr>
+                <tr>
+                  <th scope="row">En Frontera TCP</th>
+                  <td>{{pintarImporteConDecimal(planMensualPost.planFronteraTCP)}}</td>
+                  <td id="realFronteraTCP">{{pintarImporteConDecimal(planMensualPost.realFronteraTCP)}}</td>
+                  <td><div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" :style="{width: `${porcentajeMesTCP}%`}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{porcentajeMesTCP}}%</div>
+                  </div></td>
+                </tr>
+                <tr>
+                  <th scope="row">En Sociedad</th>
+                  <td>{{pintarImporteConDecimal(planMensualPost.planSociedad)}}</td>
+                  <td id="realSociedad">{{pintarImporteConDecimal(planMensualPost.realSociedad)}}</td>
+                  <td><div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" :style="{width: `${porcentajeMesSociedad}%`}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{porcentajeMesSociedad}}%</div>
+                  </div></td>
+                </tr>
+                <tr>
+                  <th scope="row">Devolucion</th>
+                  <td>{{pintarImporteConDecimal(planMensualPost.devolucion)}}</td>
+                  <td></td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <th scope="row">Total</th>
+                  <td>{{calcularTotalEnPlan()}}</td>
+                  <td>{{calcularTotalEnReal()}}</td>
+                  <td><div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" :style="{width: `${calcularPorcentajeTotal()}%`}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{calcularPorcentajeTotal()}}%</div>
+                  </div></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
