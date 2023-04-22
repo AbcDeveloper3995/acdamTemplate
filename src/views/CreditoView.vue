@@ -61,6 +61,12 @@ const porcentajeMesSociedad = ref(0)
 const porcentajeTotal = ref(0)
 const totalEnPlan = ref(0)
 const totalEnReal = ref(0)
+const cheques = ref([])
+const transferencias = ref([])
+const totalesCheques = ref([])
+const totalesTransferencias = ref([])
+const totalesGenerales = ref([])
+
 let loading = ref(false)
 let buscar = ref("");
 let totalPaginas = 0
@@ -291,6 +297,25 @@ const calcularPorcentajeTotal = () => {
   return porcentajeTotal.value
 }
 
+const clavesTransferencia = (obj) => Object.keys(obj)
+const creditosTransferencia = (clave) =>  transferencias.value[clave]
+const clavesCheque = (obj) => Object.keys(obj)
+const creditosCheques = (clave) => cheques.value[clave]
+
+const resumenProvincias = () => {
+  let url = `recaudacion/credito/${4}/resumenProvincias/`
+  axios.get(url)
+      .then((response) => {
+        cheques.value = response.data.creditos[0].cheque
+        totalesCheques.value = response.data.creditos[0].totalesCheques
+        transferencias.value = response.data.creditos[1].transferencia
+        totalesTransferencias.value = response.data.creditos[1].totalesTransferencias
+        totalesGenerales.value = response.data.creditos[2].totalesGenerales
+      })
+      .catch((error) => {
+        mensaje('error', 'Error', error.response.data.error)
+      })
+}
 onMounted(() => {
   getCreditoPaginados()
   getRecaudacionActual()
@@ -427,7 +452,7 @@ onMounted(() => {
           <div class="card glassmorphism">
             <div class="card-body">
               <h5 class="card-title"><i class="bi bi-layout-text-window-reverse"></i><strong> Listado de Creditos</strong></h5>
-              <div v-if="creditoAPI.length==0" class="alert alert-info alert-dismissible fade show" role="alert">
+              <div v-if="creditoAPI.length==0" class="alert sombra alert-info alert-dismissible fade show" role="alert">
                 <h4 class="alert-heading"><i class="bi bi-exclamation-circle me-1"></i><strong>Informacion</strong></h4>
                 <p>Aun no se han registrado ningun ingreso de credito correspondiente al dia de hoy.</p>
               </div>
@@ -458,7 +483,6 @@ onMounted(() => {
                     <th scope="col">Acciones</th>
                     <th scope="col">Utilizador</th>
                     <th scope="col">Importe</th>
-                    <th scope="col">Sucursal</th>
                     <th scope="col">Provincia</th>
                     <th scope="col">Municipio</th>
                     <th scope="col">Transferencia</th>
@@ -479,7 +503,6 @@ onMounted(() => {
                     </td>
                     <td>{{ item.fk_utilizador }}</td>
                     <td> <span class="badge bg-primary"><i class="bi bi-currency-dollar"> {{ pintarImporteConDecimal(item.importe) }}</i></span></td>
-                    <td>{{ item.fk_sucursal }}</td>
                     <td>{{ item.provincia }}</td>
                     <td>{{ item.municipio }}</td>
                     <td><i :class="item.transferencia === ''?'bi bi-x-circle-fill':''"
@@ -513,6 +536,12 @@ onMounted(() => {
             <li class="nav-item flex-fill" role="presentation">
               <button class="nav-link w-100" @click="getPlanMes" id="contact-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contact"
                       type="button" role="tab" aria-controls="contact" aria-selected="false">Plan del Mes</button></li>
+            <li class="nav-item flex-fill" role="presentation">
+              <button class="nav-link w-100" @click="resumenProvincias" id="contactt-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contactt"
+                      type="button" role="tab" aria-controls="contact" aria-selected="false">Resumen Por Provincias</button></li>
+            <li class="nav-item flex-fill" role="presentation">
+              <button class="nav-link w-100"  id="contactt-tab" data-bs-toggle="tab" data-bs-target="#bordered-justified-contacttt"
+                      type="button" role="tab" aria-controls="contact" aria-selected="false">Acumulado</button></li>
           </ul>
           <div class="tab-content pt-2" id="borderedTabJustifiedContent">
             <div class="tab-pane fade show active" id="bordered-justified-home" role="tabpanel" aria-labelledby="home-tab">
@@ -668,6 +697,58 @@ onMounted(() => {
                 </tr>
                 </tbody>
               </table>
+            </div>
+            <div class="tab-pane fade" id="bordered-justified-contactt" role="tabpanel" aria-labelledby="contact-tab">
+              <p class="text-center"><span class="text-uppercase badge rounded-pill bg-light text-dark"
+                                           style="font-size: 15px; margin-bottom: 10px">
+              CHEQUES</span></p>
+              <div class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert" data-v-943e459c="">
+                <div class="row">
+                  <div class="col" v-for="i in clavesCheque(cheques)">
+                    <h3>{{i}}</h3>
+                    <div>
+                      <p v-for="j in creditosCheques(i)">{{pintarImporteConDecimal(j)}}</p>
+                    </div>
+                  </div>
+                </div>
+                <hr data-v-943e459c="">
+                <div class="row">
+                  <div class="col" v-for="i in totalesCheques">
+                    <h5 class="text-dark">${{pintarImporteConDecimal(i)}}</h5>
+                  </div>
+                </div></div>
+              <br>
+              <p class="text-center"><span class="text-uppercase badge rounded-pill bg-light text-dark"
+                                           style="font-size: 15px; margin-bottom: 10px">
+              TRANSFERENCIAS</span></p>
+              <div class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert" data-v-943e459c="">
+                <div class="row">
+                  <div class="col" v-for="i in clavesTransferencia(transferencias)">
+                    <h3>{{i}}</h3>
+                    <div>
+                      <p v-for="j in creditosTransferencia(i)">{{pintarImporteConDecimal(j)}}</p>
+                    </div>
+                  </div>
+                </div>
+                <hr data-v-943e459c="">
+                <div class="row">
+                  <div class="col" v-for="i in totalesTransferencias">
+                    <h5 class="text-dark">${{pintarImporteConDecimal(i)}}</h5>
+                  </div>
+                </div></div>
+              <br>
+              <p class="text-center"><span class="text-uppercase badge rounded-pill bg-light text-dark"
+                                           style="font-size: 15px; margin-bottom: 10px">
+              GENERALES</span></p>
+              <div class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert" data-v-943e459c="">
+                <div class="row">
+                  <div class="col" v-for="i in totalesGenerales">
+                    <h5 class="text-dark">${{pintarImporteConDecimal(i)}}</h5>
+                  </div>
+                </div></div>
+            </div>
+            <div class="tab-pane fade" id="bordered-justified-contacttt" role="tabpanel" aria-labelledby="contact-tab">
+              acumulado
             </div>
           </div>
         </div>
