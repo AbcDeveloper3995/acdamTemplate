@@ -8,7 +8,8 @@ import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
 import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
-import CHOICES from '../util/choicesDeRecaudacion'
+import CHOICES_RECAUDACION from '../util/choicesDeRecaudacion'
+import CHOICES from '../util/choicesDeLicenciamiento'
 import {generarCodigo} from '../util/functiosGlobal'
 
 //DECLARACIONES
@@ -31,7 +32,7 @@ pk: '',
   municipio: '',
   transferencia: '',
   cheque: '',
-  factura: '',
+  factura: null,
   devolucion: '',
   tipoEstatal: '',
   observacion: '',
@@ -66,6 +67,12 @@ const transferencias = ref([])
 const totalesCheques = ref([])
 const totalesTransferencias = ref([])
 const totalesGenerales = ref([])
+const frontera = ref('')
+const fechaLimite = ref('')
+const planAcumulado = ref(0)
+const realAcumulado = ref(0)
+const porcentajeAcumulado = ref(0)
+const municipioAPI = ref([])
 
 let loading = ref(false)
 let buscar = ref("");
@@ -76,7 +83,7 @@ let paginaActual = 0
 //PETICION GET PARA OBTENER LOS CREDITOS YA PAGINADOS
 const getCreditoPaginados = async (NoPagina = 1) => {
 try {
-let url = `recaudacion/credito/${NoPagina}/paginado`
+let url = `recaudacion/credito/${NoPagina}-${dataPost.value.fk_recaudacion}/paginado`
 loading = true
 let response = await axios.get(url)
 loading = false
@@ -155,7 +162,7 @@ const getProvinciaYmunicipio = (event) => {
 
 //FUNCION PARA OBTENER LA RECAUDACION ACTUAL
 const getRecaudacionActual = () => {
-  let url = `recaudacion/recaudacion/getRecaudacionActual/`
+  let url = `recaudacion/recaudacion/getRecaudacionUltimas4/`
   axios.get(url)
       .then((response) => {
         recaudacionAPI.value = response.data
@@ -168,13 +175,19 @@ const getRecaudacionActual = () => {
 //FUNCION PARA DESABILITAR EL CAMPO CHEQUE SI EL CREDITO ES POR TRANSFERENCIA
 const desabilitarCheque = (event) => {
   let cheque = document.getElementById('cheque')
+  let provincias = document.getElementById('provincias')
+  let municipios = document.getElementById('municipios')
   cheque.disabled = true
+  provincias.disabled = true
+  municipios.disabled = true
 }
 
 //FUNCION PARA DESABILITAR EL CAMPO TRANSFERENCIA SI EL CREDITO ES POR CHEQUE
 const desabilitarTransferencia = (event) => {
   let transferencia = document.getElementById('transferencia')
+  let sucursal = document.getElementById('sucursal')
   transferencia.disabled = true
+  sucursal.disabled = true
 }
 
 //FUNCION PARA CALCULAR LAS CANTIDADES RECAUDADAS POR BANCO
@@ -316,6 +329,47 @@ const resumenProvincias = () => {
         mensaje('error', 'Error', error.response.data.error)
       })
 }
+
+const getAcumuladoReal = () => {
+  if(frontera.value==''){
+    mensaje('error', 'Error', 'Debe seleccionar un tipo de frontera.')
+    return false
+  }
+  if(planAcumulado.value<0){
+    mensaje('error', 'Error', 'El campo Plan acumulado no puede ser negativo.')
+    return false
+  }
+  if(fechaLimite.value==0){
+    mensaje('error', 'Error', 'El campo fecha es requerido')
+    return false
+  }
+  let url = `recaudacion/credito/${frontera.value},${fechaLimite.value}/acumuladoReal/`
+  axios.get(url)
+      .then((response) => {
+        realAcumulado.value = response.data.real
+        porcentajeAcumulado.value = realAcumulado.value*100/planAcumulado.value
+        porcentajeAcumulado.value = Math.round(porcentajeAcumulado.value*100)/100
+      })
+      .catch((error) => {
+        mensaje('error', 'Error', error.response.data.error)
+      })
+}
+
+//FUNCION PARA OBTENER LOS MUNICIPIOS SEGUN LA PROVINCIA SELECCIONADA
+const getMunicipios = (event) => {
+  let slug = event.target.value
+  let url = `licenciamiento/representante/${slug}/getMunicipios/`
+  axios.get(url)
+      .then((response) => {
+        municipioAPI.value = response.data
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
+
+const reset = () => window.location.reload()
+
 onMounted(() => {
   getCreditoPaginados()
   getRecaudacionActual()
@@ -350,47 +404,17 @@ onMounted(() => {
             </ul>
             <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioCargo"
                  data-bs-parent="#cardFormulario">
-              <form class="row g-3">
+              <form class="row g-3" id="formCredito">
                 <div class="col-md-4">
-                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Recaudacion</label>
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_recaudacion">
-                    <option v-for="item in recaudacionAPI" :key="item.id" :value="item.id">{{ item.fechaCreacion }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-md-4">
-                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Sucursal</label>
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" @change="getProvinciaYmunicipio" v-model="dataPost.fk_sucursal">
-                    <option v-for="item in sucursalAPI" :key="item.id" :value="item.id">{{ item.codigo }}
-                    </option>
-                  </select>
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_recaudacion">
+                      <option v-for="item in recaudacionAPI" :key="item.id" :value="item.id">{{ item.fechaCreacion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Recaudacion</label>
+                  </div>
                 </div>
                 <div class="col-md-4">
-                  <label for="inputState" class="form-label" style="margin-left: 15px"><span class="text-danger">* </span>Utilizador</label>
-                  <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_utilizador">
-                    <option v-for="item in utilizadorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
-                    </option>
-                  </select>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.importe"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Importe</label></div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.provincia"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Provincia</label></div>
-                </div>
-                <div class="col-md-3">
-                  <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.municipio"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Municipio</label></div>
-                </div>
-                <div class="col-md-3">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.transferencia"
                                                     id="transferencia"
                                                     @click="desabilitarCheque"
@@ -403,6 +427,48 @@ onMounted(() => {
                                                     @click="desabilitarTransferencia"
                                                     placeholder="Nombre"> <label for="floatingName">
                     <span class="text-danger">* </span>Cheque</label></div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="sucursal" aria-label="Cargo" @change="getProvinciaYmunicipio" v-model="dataPost.fk_sucursal">
+                      <option v-for="item in sucursalAPI" :key="item.id" :value="item.id">{{ item.codigo }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Sucursal</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="provincias" aria-label="Cargo" @change="getMunicipios" v-model="dataPost.provincia">
+                      <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Provincia</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="municipios" aria-label="Cargo" v-model="dataPost.municipio">
+                      <option v-for="item in municipioAPI" :key="item.id" :value="item.nombre">{{ item.nombre }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Municipio</label>
+                  </div>
+                </div>
+                <div class="col-md-3">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_utilizador">
+                      <option v-for="item in utilizadorAPI" :key="item.id" :value="item.id">{{ item.nombre }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect"><span class="text-danger">* </span>Utilizador</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.importe"
+                                                    id="floatingName"
+                                                    placeholder="Nombre"> <label for="floatingName">
+                    <span class="text-danger">* </span>Importe</label></div>
                 </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="number" class="styleInput form-control" v-model="dataPost.factura"
@@ -419,7 +485,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.tipoEstatal">
-                      <option v-for="item in CHOICES[0].CREDITO" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      <option v-for="item in CHOICES_RECAUDACION[0].CREDITO" :key="item.value" :value="item.value">{{ item.descripcion }}
                       </option>
                     </select>
                     <label for="floatingSelect"><span class="text-danger">* </span>Tipo</label>
@@ -439,7 +505,7 @@ onMounted(() => {
                 <div class="text-center">
                   <button @click="POST_PUT('recaudacion/credito/', dataPost, indice)"  class="miBtn btn btn-outline-light" type="button">
                     <i class="bi bi-arrow-bar-right"></i> {{ indice == -1 ? 'Agregar' : 'Actualizar' }}</button>
-                  <button v-if="indice==-1" type="reset" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
+                  <button v-if="indice==-1" @click="reset" type="button" class="miBtn btn btn-outline-dark m-lg-1"><i class="bx bx-eraser"></i> Resetear</button>
                 </div>
               </form>
             </div>
@@ -748,7 +814,61 @@ onMounted(() => {
                 </div></div>
             </div>
             <div class="tab-pane fade" id="bordered-justified-contacttt" role="tabpanel" aria-labelledby="contact-tab">
-              acumulado
+              <div class="alert sombra alert-warning alert-dismissible fade show" role="alert" data-v-4028e7a6="">
+                <h4 class="alert-heading" data-v-4028e7a6=""><i class="bi bi-exclamation-diamond" data-v-4028e7a6="">
+                </i><strong data-v-4028e7a6=""> Atencion</strong></h4>
+                <p data-v-4028e7a6="">Complete los siguientes campos para saber el real acumulado.</p></div>
+              <form class="row">
+                <div class="col-md-4">
+                  <div class="form-floating "><select class="styleInput form-select" id="floatingSelect" aria-label="State" v-model="frontera">
+                    <option value="">-----------</option>
+                    <option value="1">En Frotera Estatal</option>
+                    <option value="2">En Frontera TCP</option>
+                    <option value="3">Sociedad</option>
+                  </select> <label for="floatingName"><span
+                      class="text-danger">*</span> Fronteras</label></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control"
+                                                    id="floatingName" v-model="planAcumulado"
+                                                    placeholder="Nombre"> <label for="floatingName"><span
+                      class="text-danger">* </span>Plan Acumulado</label><br></div>
+                </div>
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="date" class="styleInput form-control"
+                                                    id="floatingName" v-model="fechaLimite"
+                                                    placeholder="Nombre"> <label for="floatingName"><span
+                      class="text-danger">* </span>Fecha Limite</label></div>
+                </div>
+
+                <div class="col-md-4">
+                  <div class="form-floating"><input type="number" class="styleInput form-control" readonly hidden
+                                                    id="floatingName"
+                                                    placeholder="Nombre"></div>
+                </div>
+              </form>
+              <button @click="getAcumuladoReal"  class="miBtn btn btn-outline-light" type="button">
+                <i class="bi bi-currency-euro"></i> Obtener acumulado real</button>
+              <hr>
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col" style="width: 35%">Plan Acumulado</th>
+                  <th scope="col" style="width: 25%">Real Acumulado</th>
+                  <th scope="col" class="text-center">%</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td>${{pintarImporteConDecimal(`${planAcumulado}`)}}</td>
+                  <td id="realFronteraEstatal">${{pintarImporteConDecimal(realAcumulado)}}</td>
+                  <td><div class="progress">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         role="progressbar" :style="{width: `${porcentajeAcumulado}%`}" aria-valuenow="10" aria-valuemin="0" aria-valuemax="100">{{porcentajeAcumulado}}%</div>
+                  </div></td>
+                </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>

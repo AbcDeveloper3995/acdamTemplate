@@ -1,4 +1,4 @@
-const CHOICES = [
+const CHOICES_RECAUDACION = [
     {
         CREDITO: [
             {value: 1, descripcion: 'Metropolitano estatal'},
@@ -9,4 +9,4 @@ const CHOICES = [
         ]
     },
 ]
-export default CHOICES
+export default CHOICES_RECAUDACION
