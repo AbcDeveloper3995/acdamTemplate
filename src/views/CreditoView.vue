@@ -73,6 +73,8 @@ const planAcumulado = ref(0)
 const realAcumulado = ref(0)
 const porcentajeAcumulado = ref(0)
 const municipioAPI = ref([])
+const fechaInicio = ref('')
+const provincia = ref('')
 
 let loading = ref(false)
 let buscar = ref("");
@@ -369,6 +371,20 @@ const getMunicipios = (event) => {
 }
 
 const reset = () => window.location.reload()
+const enviarEmail = () => {
+  let url = `recaudacion/credito/${fechaInicio.value},${provincia.value}/enviarEmail/`
+  if (provincia.value==''){
+    mensaje('error','Error', 'Debe selecionar la provincia a notificar.')
+    return false
+  }
+  axios.get(url)
+      .then((response) => {
+        response.data.hasOwnProperty('error')?mensaje('error','Error', response.data.error):mensaje('success','Exito', response.data.sms)
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
 
 onMounted(() => {
   getCreditoPaginados()
@@ -408,7 +424,7 @@ onMounted(() => {
                 <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_recaudacion">
-                      <option v-for="item in recaudacionAPI" :key="item.id" :value="item.id">{{ item.fechaCreacion }}
+                      <option v-for="item in recaudacionAPI" :key="item.id" :value="item.id">{{ item.fechaEstadoCuenta }}
                       </option>
                     </select>
                     <label for="floatingSelect"><span class="text-danger">* </span>Recaudacion</label>
@@ -512,10 +528,65 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
       <!--      RENDERIZADO DE LA TABLA-->
       <div class="row">
         <div class="col-lg-12">
           <div class="card glassmorphism">
+            <div class="filter">
+              <a class="icon" href="#" data-bs-toggle="dropdown"><i style="color: black" class="bi bi-three-dots"></i></a>
+              <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow">
+                <li class="dropdown-header text-start">
+                  <h6>Acciones</h6>
+                </li>
+                <li><a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#sendEmail"
+                        href="#"><i class="bi bi-envelope"></i>Enviar correo</a></li>
+              </ul>
+            </div>
+            <!--          MODAL ENVIAR CORREO-->
+            <div class="modal fade" id="sendEmail" tabindex="-1">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-envelope"></i> <strong> Envio de Correo</strong></h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                  </div>
+                  <div class="modal-body">
+                    <div class="alert alert-warning sombra alert-dismissible fade show" role="alert">
+                      <h4 class="alert-heading"><i class="bi bi-exclamation-triangle me-1"></i><strong>Atencion</strong></h4>
+                      <p>Solo seleccione la <span class="text-uppercase text-dark text-decoration-underline">fecha inicial</span>  en caso de haber generado hoy ingresos de credito anteriores al dia de ayer.</p>
+                    </div>
+                    <form class="row">
+                      <div class="col-md-3">
+                        <div class="form-floating mb-3">
+                          <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo"  v-model="provincia">
+                            <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                            </option>
+                          </select>
+                          <label for="floatingSelect"><span class="text-danger">* </span>Provincia</label>
+                        </div>
+                      </div>
+                      <div class="col-md-3">
+                        <div class="form-floating"><input type="date" class="styleInput form-control"
+                                                          id="floatingName"
+                                                          v-model="fechaInicio"
+                                                          placeholder="Nombre"> <label for="floatingName">Fecha Inicial</label><br></div>
+                      </div>
+                      <div class="text-center">
+                        <button
+                            @click="enviarEmail"
+                            class="miBtn btn btn-outline-dark" type="button">
+                          <i class="bi bi-cursor"></i> Enviar
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div class="card-body">
               <h5 class="card-title"><i class="bi bi-layout-text-window-reverse"></i><strong> Listado de Creditos</strong></h5>
               <div v-if="creditoAPI.length==0" class="alert sombra alert-info alert-dismissible fade show" role="alert">
@@ -575,7 +646,8 @@ onMounted(() => {
                            :style="item.transferencia === ''?'color: red':''"></i>{{item.transferencia}}</td>
                     <td><i :class="item.cheque === ''?'bi bi-x-circle-fill':''"
                            :style="item.cheque === ''?'color: red':''"></i>{{item.cheque}}</td>
-                    <td>{{ item.factura }}</td>
+                    <td><i :class="item.factura === null?'bi bi-x-circle-fill':''"
+                           :style="item.factura === null?'color: red':''"></i>{{item.factura}}</td>
                     <td><i :class="item.devolucion === null?'bi bi-x-circle-fill':''"
                            :style="item.devolucion === null?'color: red':''"></i>{{item.devolucion}}</td>
                     <td>{{ item.tipoEstatal }}</td>
@@ -588,6 +660,7 @@ onMounted(() => {
         </div>
       </div>
 
+<!--      RENDERIZADO DEL COMPONENTE TABS-->
       <div class="card glassmorphism">
         <div class="card-body">
           <h5 class="card-title"><strong>Recaudacion General</strong></h5>
@@ -621,7 +694,7 @@ onMounted(() => {
                                                     readonly
                                                     id="floatingName"
                                                     placeholder="Nombre">
-                    <label for="floatingName">Total Banco Metropolitano Estatal</label></div>
+                    <label for="floatingName">Metropolitano Estatal</label></div>
                 </div>
                 <div class="col-md-3">
                   <div class="form-floating"><input type="number" class="form-control"
@@ -629,7 +702,7 @@ onMounted(() => {
                                                     readonly
                                                     id="floatingName"
                                                     placeholder="Nombre">
-                    <label for="floatingName">Total Banco Metropolitano No Estatal</label></div>
+                    <label for="floatingName">Metropolitano No Estatal</label></div>
                 </div>
                 <div class="col-md-3">
                   <div class="form-floating"><input type="number" class="form-control"
@@ -637,7 +710,7 @@ onMounted(() => {
                                                     readonly
                                                     id="floatingName"
                                                     placeholder="Nombre">
-                    <label for="floatingName">Total BFI Estatal</label></div>
+                    <label for="floatingName">BFI Estatal</label></div>
                 </div>
                 <div class="col-md-3">
                   <div class="form-floating"><input type="number" class="form-control"
@@ -645,7 +718,7 @@ onMounted(() => {
                                                     readonly
                                                     id="floatingName"
                                                     placeholder="Nombre">
-                    <label for="floatingName">Total BFI No Estatal</label></div>
+                    <label for="floatingName">BFI No Estatal</label></div>
                 </div>
                 <div class="col-md-3">
                   <div class="form-floating"><input type="number" class="form-control"
@@ -653,7 +726,7 @@ onMounted(() => {
                                                     readonly
                                                     id="floatingName"
                                                     placeholder="Nombre">
-                    <label for="floatingName">Total Sociedades</label></div>
+                    <label for="floatingName">Sociedades</label></div>
                 </div>
                 <div class="col-md-3">
                   <div class="form-floating"><input type="number" class=" form-control"

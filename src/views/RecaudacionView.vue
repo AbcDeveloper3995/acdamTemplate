@@ -18,7 +18,6 @@ const expandir = expandirActualizado //VARIABLE QUE CONTROLA SI SE EXPANDE O SE 
 const recaudacionAPI = ref([])
 const dataPost = ref({
   pk: '',
-  fechaCreacion: '',
   fechaEstadoCuenta: '',
   numeroEstadoCuenta: '',
   saldoAnterior: '',
@@ -178,12 +177,6 @@ onMounted(() => {
             <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioCargo"
                  data-bs-parent="#cardFormulario">
               <form class="row g-3">
-                <div class="col-md-4">
-                  <div class="form-floating"><input type="date" class="styleInput form-control" v-model="dataPost.fechaCreacion"
-                                                    id="floatingName"
-                                                    placeholder="Nombre"> <label for="floatingName">
-                    <span class="text-danger">* </span>Fecha Recaudacion</label><br></div>
-                </div>
                 <div class="col-md-4">
                   <div class="form-floating"><input type="date" class="styleInput form-control" v-model="dataPost.fechaEstadoCuenta"
                                                     id="floatingName"
