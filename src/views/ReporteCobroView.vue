@@ -1,7 +1,10 @@
 <script setup>
+
+import {computed, ref} from "vue";
+
 import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
-import {computed, ref} from "vue";
+import {PDF} from '../util/functiosGlobal'
 
 const input = `<input type='text'>`
 const miLista = [{
@@ -52,10 +55,10 @@ const reiniciar = () => {
   cont.value = 0
 }
 const a = computed(()=>{
-  if(cont.value<=5){
+  if(cont.value>=15){
     return 'bg-dark'
   }
-  if(cont.value>5){
+  if(cont.value>=9){
     return 'bg-danger'
   }
 })
@@ -77,7 +80,12 @@ const a = computed(()=>{
         <div class="card glassmorphism">
           <div class="card-body">
             <h5 class="card-title">REPORTE DE COBRO</h5>
-            <div class="table-responsive">
+              <button
+                  @click="PDF('ReporteCobro')" style="margin-bottom: 10px"
+                  class="miBtn btn btn-outline-dark" type="button">
+                <i class="bi bi-file-pdf"></i> Generar PDF
+              </button>
+            <div class="table-responsive" id="ReporteCobro">
               <table class="table table-bordered" style="border: black">
                 <thead>
                 <tr>
@@ -179,5 +187,8 @@ const a = computed(()=>{
 </template>
 
 <style scoped>
-
+.miBtn{
+  border-radius: 10px;
+  box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
+}
 </style>

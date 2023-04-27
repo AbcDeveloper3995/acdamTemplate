@@ -8,7 +8,6 @@ const indiceActualizado = ref(-1)
 const expandirActualizado = ref(true)
 
 const POST_PUT = async (url, dataPost, indice) => {
-    console.log(dataPost, url, indice)
     try {
         if (indice == -1) {
             let response = await axios.post(url, dataPost)
