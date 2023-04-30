@@ -1,13 +1,13 @@
 <script setup>
 import axios from "axios";
+import {onMounted, ref} from "vue";
+import {useRouter} from "vue-router";
 
 import Base from "@/components/base/Base.vue";
 import MensajeBienvenida from "@/components/content/MensajeBienvenida.vue";
 import {notificaciones} from '@/util/notificacionesGlobal'
-
-import {onMounted, ref} from "vue";
-import {useRouter} from "vue-router";
 import {GET, POST_PUT, DELETE, indiceActualizado, expandirActualizado} from '../util/peticionesServer'
+import CHOICES from '../util/choicesDeLicenciamiento'
 
 //DECLARACIONES
 const router =useRouter()
@@ -23,6 +23,7 @@ const dataPost = ref({
   last_name: '',
   fk_cargo: '',
   username: '',
+  provincia: '',
   password: '',
   email: '',
   groups: '',
@@ -65,6 +66,7 @@ const editarUsuario = async (item, index) => {
         dataPost.value.last_name = response.data.data.last_name
         dataPost.value.fk_cargo = response.data.data.fk_cargo
         dataPost.value.username = response.data.data.username
+        dataPost.value.provincia = response.data.data.provincia
         dataPost.value.password = response.data.data.password
         dataPost.value.email = response.data.data.email
         dataPost.value.groups = response.data.data.groups
@@ -130,17 +132,26 @@ onMounted(() => {
             <div class="card-body nav-content" :class="expandir ? 'collapse':''" id="formularioUsuario"
                  data-bs-parent="#cardFormulario">
               <form class="row g-3" id="formPrueba">
-                <div class="col-md-12">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.first_name"
                                                     id="floatingName"
                                                     placeholder="Nombre"> <label for="floatingName">Nombre</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.last_name"
                                                     id="floatingEmail" placeholder="Apellidos"> <label
                       for="floatingEmail">Apellidos</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
+                  <div class="form-floating mb-3">
+                    <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.provincia">
+                      <option v-for="item in CHOICES[7].PROVINCIA" :key="item.value" :value="item.value">{{ item.descripcion }}
+                      </option>
+                    </select>
+                    <label for="floatingSelect">Provincia que atiende</label>
+                  </div>
+                </div>
+                <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Cargo" v-model="dataPost.fk_cargo">
                       <option v-for="item in cargosAPI" :key="item.id" :value="item.id">{{ item.nombre }}
@@ -149,22 +160,22 @@ onMounted(() => {
                     <label for="floatingSelect">Cargo</label>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="text" class="styleInput form-control" v-model="dataPost.username"
                                                     id="floatingEmail" placeholder="nivel"> <label for="floatingEmail">Nombre usuario</label>
                   </div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="password" class="styleInput form-control" v-model="dataPost.password"
                                                     id="floatingPassword" placeholder="Dorsal"> <label
                       for="floatingPassword">Contraseña</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="form-floating"><input type="email" class="styleInput form-control" v-model="dataPost.email"
                                                     id="floatingPassword" placeholder="Goles"> <label
                       for="floatingPassword">Correo</label></div>
                 </div>
-                <div class="col-md-6">
+                <div class="col-md-4">
                   <div class="form-floating mb-3">
                     <select class="styleInput form-select" id="floatingSelect" aria-label="Posicion" v-model="dataPost.groups" multiple>
                       <option v-for="(item, index) in gruposAPI" :key="index" :value="item.id">
@@ -219,6 +230,7 @@ onMounted(() => {
                     <th scope="col">Apellidos</th>
                     <th scope="col">Cargo</th>
                     <th scope="col">Username</th>
+                    <th scope="col">Provincia que atiende</th>
                     <th scope="col">Correo</th>
                     <th scope="col">Rol</th>
                   </tr>
@@ -236,6 +248,7 @@ onMounted(() => {
                     <td>{{ item.last_name }}</td>
                     <td>{{ item.fk_cargo }}</td>
                     <td>{{ item.username }}</td>
+                    <td>{{ item.provincia }}</td>
                     <td>{{ item.email }}</td>
                     <td><span class="badge bg-primary"  style="margin-left: 5px" v-for="i in item.groups">{{ i.name }}</span></td>
                   </tr>

@@ -28,6 +28,7 @@ const logearse = async (e) => {
     localStorage.setItem('username', response.data.usuario.username)
     localStorage.setItem('nombre', response.data.usuario.nombre)
     localStorage.setItem('apellidos', response.data.usuario.apellidos)
+    localStorage.setItem('provincia', response.data.usuario.provincia)
     if (response.status == 200) {
       mensaje('success','Exito', response.data.message)
       await router.push('/home')
