@@ -17,6 +17,7 @@ const utilizadoresAPI = ref([])
 const reporteUtilizadorAPI = ref([])
 const representanteSelected = ref('')
 const nombreUtilizador = ref('')
+const idRepresentante = ref(0)
 const dataPost = ref({
   pk:'',
   fk_credito:'',
@@ -54,6 +55,38 @@ const totales = ref({
   totalRestaurante: 0,
   totalCNocturno: 0,
 })
+const totalesGeneralesConceptos = ref({
+  totalRealAcumulado: 0,
+  totalEnero: 0,
+  totalFebrero: 0,
+  totalMarzo: 0,
+  totalAbril: 0,
+  totalMayo: 0,
+  totalJunio: 0,
+  totalJulio: 0,
+  totalAgosto: 0,
+  totalSeptiembre: 0,
+  totalOctubre: 0,
+  totalNoviembre: 0,
+  totalDiciembre: 0,
+})
+const totalesGeneralesModalidades = ref({
+  totalRealAcumulado: 0,
+  totalEnero: 0,
+  totalFebrero: 0,
+  totalMarzo: 0,
+  totalAbril: 0,
+  totalMayo: 0,
+  totalJunio: 0,
+  totalJulio: 0,
+  totalAgosto: 0,
+  totalSeptiembre: 0,
+  totalOctubre: 0,
+  totalNoviembre: 0,
+  totalDiciembre: 0,
+})
+const resumenGeneralConceptos = ref([])
+const resumenGeneralModalidad = ref([])
 
 //FUNCION PARA OBTENER LOS REPRESENTANTES SEGUN LA PROVINCIA DEL USUARIO EN SECCION
 const getRepresentantesUnaProvincia = () => {
@@ -70,8 +103,39 @@ const getRepresentantesUnaProvincia = () => {
 
 //FUNCION PARA OBTENER LOS UTILIZADORES QUE ATIENDE UN REPRESENTANTE
 const getUtilizadoresDelRepresentante = (event) => {
-  let idRepresentante = event.target.value
-  let url = `licenciamiento/representante/${idRepresentante}/getUtilizadores/`
+  idRepresentante.value = event.target.value
+  //REINICIALIZAR VARIABLES VINCULAS AL REPORTE GENERAL
+  resumenGeneralConceptos.value = []
+  resumenGeneralModalidad.value = []
+  totalesGeneralesConceptos.value.totalRealAcumulado = 0
+  totalesGeneralesConceptos.value.totalEnero = 0
+  totalesGeneralesConceptos.value.totalFebrero = 0
+  totalesGeneralesConceptos.value.totalMarzo = 0
+  totalesGeneralesConceptos.value.totalAbril  = 0
+  totalesGeneralesConceptos.value.totalMayo = 0
+  totalesGeneralesConceptos.value.totalJunio = 0
+  totalesGeneralesConceptos.value.totalJulio = 0
+  totalesGeneralesConceptos.value.totalAgosto = 0
+  totalesGeneralesConceptos.value.totalSeptiembre = 0
+  totalesGeneralesConceptos.value.totalOctubre = 0
+  totalesGeneralesConceptos.value.totalNoviembre = 0
+  totalesGeneralesConceptos.value.totalDiciembre = 0
+
+  totalesGeneralesModalidades.value.totalRealAcumulado = 0
+  totalesGeneralesModalidades.value.totalEnero = 0
+  totalesGeneralesModalidades.value.totalFebrero = 0
+  totalesGeneralesModalidades.value.totalMarzo = 0
+  totalesGeneralesModalidades.value.totalAbril  = 0
+  totalesGeneralesModalidades.value.totalMayo = 0
+  totalesGeneralesModalidades.value.totalJunio = 0
+  totalesGeneralesModalidades.value.totalJulio = 0
+  totalesGeneralesModalidades.value.totalAgosto = 0
+  totalesGeneralesModalidades.value.totalSeptiembre = 0
+  totalesGeneralesModalidades.value.totalOctubre = 0
+  totalesGeneralesModalidades.value.totalNoviembre = 0
+  totalesGeneralesModalidades.value.totalDiciembre = 0
+
+  let url = `licenciamiento/representante/${idRepresentante.value}/getUtilizadores/`
   axios.get(url)
       .then((response) => {
         representanteSelected.value = `${response.data.nombre} ${response.data.apellidos}`
@@ -113,7 +177,7 @@ const getReportesUtilizador = (id) => {
 const asignarNombreUtilizador = (nombre) => nombreUtilizador.value = nombre
 const pintarImporteConDecimal = (item) => parseFloat(item).toFixed(2)
 const inicializarDataPostYTotales = () => {
-  //INICIALIZAR DATA POST
+  //REINICIALIZAR DATA POST
   dataPost.value.pk = ''
   dataPost.value.fk_utilizador = ''
   dataPost.value.fk_credito = ''
@@ -133,7 +197,7 @@ const inicializarDataPostYTotales = () => {
   dataPost.value.montoCafeteria = 0.00
   dataPost.value.montoRestaurante = 0.00
   dataPost.value.montoCNocturno = 0.00
-  //INICIALIZAR TOTALES
+  //REINICIALIZAR TOTALES
   totales.value.totalMusicaViva = 0
   totales.value.totalMusicaGrabada = 0
   totales.value.totalDerecho = 0
@@ -148,10 +212,60 @@ const inicializarDataPostYTotales = () => {
   totales.value.totalCafeteria = 0
   totales.value.totalRestaurante = 0
   totales.value.totalCNocturno = 0
-  //INICIALIZAR LISTADO DE REPORTES
+  //REINICIALIZAR LISTADO DE REPORTES
   reporteUtilizadorAPI.value = []
 }
 
+const getGestionGeneral = () => {
+  // REINICIALIZAR LOS TOTALES
+  let clavesConceptos = Object.keys(totalesGeneralesConceptos.value)
+  clavesConceptos.forEach(item => {
+    totalesGeneralesConceptos.value[item] = 0
+  })
+  let clavesModalidades = Object.keys(totalesGeneralesModalidades.value)
+  clavesModalidades.forEach(item => {
+    totalesGeneralesModalidades.value[item] = 0
+  })
+  let url = `recaudacion/reporteCobroUtilizador/${idRepresentante.value}/getGestionGeneral/`
+  axios.get(url)
+      .then((response) => {
+        resumenGeneralConceptos.value = response.data.conceptos
+        resumenGeneralConceptos.value.forEach(item => {
+          totalesGeneralesConceptos.value.totalRealAcumulado += item.totalReal
+          totalesGeneralesConceptos.value.totalEnero += item.enero
+          totalesGeneralesConceptos.value.totalFebrero += item.febrero
+          totalesGeneralesConceptos.value.totalMarzo += item.febrero
+          totalesGeneralesConceptos.value.totalAbril += item.abril
+          totalesGeneralesConceptos.value.totalMayo += item.mayo
+          totalesGeneralesConceptos.value.totalJunio += item.junio
+          totalesGeneralesConceptos.value.totalJulio += item.julio
+          totalesGeneralesConceptos.value.totalAgosto += item.agosto
+          totalesGeneralesConceptos.value.totalSeptiembre += item.septiembre
+          totalesGeneralesConceptos.value.totalOctubre += item.octubre
+          totalesGeneralesConceptos.value.totalNoviembre += item.noviembre
+          totalesGeneralesConceptos.value.totalDiciembre += item.diciembre
+        })
+        resumenGeneralModalidad.value = response.data.modalidades
+        resumenGeneralModalidad.value.forEach(item => {
+          totalesGeneralesModalidades.value.totalRealAcumulado += item.totalReal
+          totalesGeneralesModalidades.value.totalEnero += item.enero
+          totalesGeneralesModalidades.value.totalFebrero += item.febrero
+          totalesGeneralesModalidades.value.totalMarzo += item.febrero
+          totalesGeneralesModalidades.value.totalAbril += item.abril
+          totalesGeneralesModalidades.value.totalMayo += item.mayo
+          totalesGeneralesModalidades.value.totalJunio += item.junio
+          totalesGeneralesModalidades.value.totalJulio += item.julio
+          totalesGeneralesModalidades.value.totalAgosto += item.agosto
+          totalesGeneralesModalidades.value.totalSeptiembre += item.septiembre
+          totalesGeneralesModalidades.value.totalOctubre += item.octubre
+          totalesGeneralesModalidades.value.totalNoviembre += item.noviembre
+          totalesGeneralesModalidades.value.totalDiciembre += item.diciembre
+        })
+      })
+      .catch((error) => {
+        mensaje('error','Error', error.response.data.error)
+      })
+}
 onMounted(() => {
   getRepresentantesUnaProvincia()
 })
@@ -282,6 +396,8 @@ onMounted(() => {
         <div class="col-12">
           <div class="card glassmorphism">
             <div class="card-body ">
+              <h5 class="card-title text-uppercase">
+                <i class="bi bi-person"></i><strong class=""> Seleccion de representante</strong></h5>
               <form style="margin-top: 10px" class="row">
                 <div class="col-md-4">
                   <div class="form-floating ">
@@ -294,7 +410,8 @@ onMounted(() => {
                 </div>
               </form>
               <hr>
-              <h5 class="card-title text-uppercase"><strong class="text-decoration-underline">{{ representanteSelected }}</strong></h5>
+              <h5 class="card-title text-uppercase"><strong>Listado de utilizadores atendidos por: </strong>
+                <strong class="text-decoration-underline"> {{ representanteSelected }}</strong></h5>
               <div class="d-flex align-items-start">
                 <div class="nav flex-column nav-pills me-3" id="v-pills-tab" role="tablist" aria-orientation="vertical">
                   <button class="nav-link" style="margin-top: 5px" v-for="item in utilizadoresAPI" :id="'#id'+item.id" data-bs-toggle="pill" :data-bs-target="'#id'+item.id"
@@ -306,8 +423,8 @@ onMounted(() => {
                     <!--      RENDERIZADO DEL FORMULARIO-->
                     <div class="alert glassmorphism border-secondary alert-dismissible fade show" role="alert">
                       <div class="filter">
-                        <a class="icon" href="#" @click="getReportesUtilizador(item.id)" title="Buscar reportes">
-                          <i class="bi bi-search" style="color: black;"></i></a></div>
+                        <a href="#" class="icon" style="color:black; margin-right: 15px" title="Obtener reportes" @click="getReportesUtilizador(item.id)">
+                          <i class="bi bi-search"></i></a></div>
                       <h5><i class="bi-archive"></i>
                         <strong> Reporte Utilizador</strong></h5>
                       <hr>
@@ -444,8 +561,8 @@ onMounted(() => {
                 <br>
                 <table class="table table-striped">
                   <thead>
-                  <tr style="background: #0b5ed7">
-                    <th colspan="20" class="text-center text-uppercase text-white">{{ nombreUtilizador }}</th>
+                  <tr class="sombra table-primary">
+                    <th colspan="20" class="text-center text-uppercase">{{ nombreUtilizador }}</th>
                   </tr>
                   <tr>
                     <th></th>
@@ -493,7 +610,7 @@ onMounted(() => {
                     <td>{{pintarImporteConDecimal(item.montoRestaurante)}}</td>
                     <td>{{pintarImporteConDecimal(item.montoCNocturno)}}</td>
                   </tr>
-                  <tr style="background: darkgray">
+                  <tr class="table-dark">
                     <td><strong>TOTAL</strong></td>
                     <td></td>
                     <td></td>
@@ -514,6 +631,160 @@ onMounted(() => {
                     <td>${{pintarImporteConDecimal(totales.totalCafeteria)}}</td>
                     <td>${{pintarImporteConDecimal(totales.totalRestaurante)}}</td>
                     <td>${{pintarImporteConDecimal(totales.totalCNocturno)}}</td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div class="card glassmorphism info-card sales-card">
+            <div class="card-body" >
+              <h5 class="card-title" >Gestion General <strong class="text-uppercase">| {{ representanteSelected }}</strong></h5>
+              <div class="filter">
+                <a class="icon" style="color: black; margin-right: 15px" href="#" title="Actualizar" @click="getGestionGeneral">
+                  <i class="bi bi-arrow-repeat"></i></a></div>
+              <div class="table-responsive">
+                <br>
+                <table class="table table-striped">
+                  <thead>
+                  <tr>
+                    <th scope="col">Concepto</th>
+                    <th scope="col">Plan Mensual</th>
+                    <th scope="col">Plan Anual</th>
+                    <th scope="col">%</th>
+                    <th scope="col">Real Acumulado</th>
+                    <th scope="col">Enero</th>
+                    <th scope="col">Febrero</th>
+                    <th scope="col">Marzo</th>
+                    <th scope="col">Abril</th>
+                    <th scope="col">Mayo</th>
+                    <th scope="col">Junio</th>
+                    <th scope="col">Julio</th>
+                    <th scope="col">Agosto</th>
+                    <th scope="col">Septiembre</th>
+                    <th scope="col">Octubre</th>
+                    <th scope="col">Noviembre</th>
+                    <th scope="col">Diciembre</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr class="sombra table-danger" >
+                    <td>CONCEPTOS</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr class="filaSombra" v-for="(item, index) in resumenGeneralConceptos" :key="item.id">
+                    <td>{{item.index}}</td>
+                    <td>{{item.noReporteFecha}}</td>
+                    <td>{{item.chequeTransfer}}</td>
+                    <td>{{item.fechaChequeTransfer}}</td>
+                    <td>{{pintarImporteConDecimal(item.totalReal)}}</td>
+                    <td>{{pintarImporteConDecimal(item.enero)}}</td>
+                    <td>{{pintarImporteConDecimal(item.febrero)}}</td>
+                    <td>{{pintarImporteConDecimal(item.marzo)}}</td>
+                    <td>{{pintarImporteConDecimal(item.abril)}}</td>
+                    <td>{{pintarImporteConDecimal(item.mayo)}}</td>
+                    <td>{{pintarImporteConDecimal(item.junio)}}</td>
+                    <td>{{pintarImporteConDecimal(item.julio)}}</td>
+                    <td>{{pintarImporteConDecimal(item.agosto)}}</td>
+                    <td>{{pintarImporteConDecimal(item.septiembre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.octubre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.noviembre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.diciembre)}}</td>
+                  </tr>
+                  <tr class="table-dark">
+                    <td><strong>TOTAL</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalRealAcumulado)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalEnero)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalFebrero)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalMarzo)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalAbril)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalMayo)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalJunio)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalJulio)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalAgosto)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalSeptiembre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalOctubre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalNoviembre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesConceptos.totalDiciembre)}}</td>
+                  </tr>
+                  <tr class="sombra table-danger">
+                    <td>MODALIDAD</td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                  </tr>
+                  <tr class="filaSombra" v-for="(item, index) in resumenGeneralModalidad" :key="item.id">
+                    <td>{{item.index}}</td>
+                    <td>{{item.noReporteFecha}}</td>
+                    <td>{{item.chequeTransfer}}</td>
+                    <td>{{item.fechaChequeTransfer}}</td>
+                    <td>{{pintarImporteConDecimal(item.totalReal)}}</td>
+                    <td>{{pintarImporteConDecimal(item.enero)}}</td>
+                    <td>{{pintarImporteConDecimal(item.febrero)}}</td>
+                    <td>{{pintarImporteConDecimal(item.marzo)}}</td>
+                    <td>{{pintarImporteConDecimal(item.abril)}}</td>
+                    <td>{{pintarImporteConDecimal(item.mayo)}}</td>
+                    <td>{{pintarImporteConDecimal(item.junio)}}</td>
+                    <td>{{pintarImporteConDecimal(item.julio)}}</td>
+                    <td>{{pintarImporteConDecimal(item.agosto)}}</td>
+                    <td>{{pintarImporteConDecimal(item.septiembre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.octubre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.noviembre)}}</td>
+                    <td>{{pintarImporteConDecimal(item.diciembre)}}</td>
+                  </tr>
+                  <tr class="table-dark">
+                    <td><strong>TOTAL</strong></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalRealAcumulado)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalEnero)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalFebrero)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalMarzo)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalAbril)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalMayo)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalJunio)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalJulio)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalAgosto)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalSeptiembre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalOctubre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalNoviembre)}}</td>
+                    <td>${{pintarImporteConDecimal(totalesGeneralesModalidades.totalDiciembre)}}</td>
                   </tr>
                   </tbody>
                 </table>
@@ -575,5 +846,13 @@ onMounted(() => {
 
 .sombra:hover {
   box-shadow: none;
+}
+
+.filaSombra {
+  transition: linear 0.5s;
+}
+
+.filaSombra:hover {
+  box-shadow: 6px 7px 10px -4px rgba(0, 0, 0, 0.82);
 }
 </style>
